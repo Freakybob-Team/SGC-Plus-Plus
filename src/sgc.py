@@ -21,12 +21,10 @@ class interpreter:
         code = self.remove_comments(code)
 
         lines = code.split('\n')
-        line_num = 0
-        while line_num < len(lines):
-            line = lines[line_num].strip()
+        for line_num, line in enumerate(lines, start=1):
+            line = line.strip()
 
             if not line:
-                line_num += 1
                 continue
 
             var_match = re.match(r'var\s+(\w+)\s*=\s*(.*)', line)
@@ -46,7 +44,8 @@ class interpreter:
                         else:
                             raise ValueError(f"Invalid expression in assignment: {expr}")
                 except Exception as e:
-                    print(f"Error on line {line_num + 1}: {e}")
+                    print(f"Error on line {line_num}: {e}")
+                    continue
 
             elif line.startswith("gPrintln"):
                 content = re.match(r'gPrintln\((.*?)\)', line).group(1).strip()
@@ -56,37 +55,8 @@ class interpreter:
                 prompt = re.match(r'gReadln\((.*?)\)', line).group(1).strip()
                 gReadln(prompt, self.variables)
 
-            elif line.startswith("for"):
-                loop_match = re.match(r'for\s*\(var\s+(\w+)\s*=\s*(\d+);\s*\1\s*(<|<=|>|>=|==|!=)\s*(\d+);\s*\1\+\+\)', line)
-                if loop_match:
-                    var_name, start, condition, end = loop_match.groups()
-                    start, end = int(start), int(end)
-
-                    if var_name not in self.variables:
-                        self.variables[var_name] = start
-
-                    loop_body = []
-                    line_num += 1
-                    while line_num < len(lines) and not lines[line_num].strip().startswith("endfor"):
-                        loop_body.append(lines[line_num].strip())
-                        line_num += 1
-
-                    if line_num >= len(lines) or not lines[line_num].strip().startswith("endfor"):
-                        print(f"Syntax Error on line {line_num + 1}: Missing 'endfor'")
-                    else:
-                        while eval(f"{self.variables[var_name]} {condition} {end}"):
-                            for loop_line in loop_body:
-                                self.execute(loop_line)
-                            self.variables[var_name] += 1
-                else:
-                    print(f"Syntax Error on line {line_num + 1}: Invalid for loop syntax (missing 'var'?)")
-                    line_num += 1
-                    continue
-
             else:
-                print(f"Syntax Error on line {line_num + 1}: Unrecognized statement: {line}")
-
-            line_num += 1
+                print(f"Syntax Error on line {line_num}: Unrecognized statement: {line}")
 
     def run_file(self, filename):
         if filename.endswith(".sgc"):
