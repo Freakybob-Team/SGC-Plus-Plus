@@ -1,0 +1,26 @@
+/*
+Test.sgc
+
+The official test file for SGC++.
+
+This script will test out some of the first features we currently have (Mar 10, 11:12 PM).
+Please note that this is in beta, and performance might be a bit buggy.
+*/
+
+// Declare variables for testing
+var sum = 40 * 2  // 40 * 2
+var message1 = "greg".upper()  // convert 'greg' to uppercase
+
+// demonstrate string manipulation in SGC++ (e.g., .upper(), .lower(), etc.)
+// Note: You can't use methods like .upper() directly in gPrintln() f-strings (e.g., gPrintln(f"greg: {greg.upper()}"))
+// this needs to be done separately or via a variable assignment.
+gPrintln(message1)  // Should print: GREG
+
+// Testing basic math and string operations with gPrintln()
+gPrintln(1 + 2)  // Should print: 3 (basic addition)
+gPrintln(f"The answer for the sum variable is: {sum}.")  // Should print: The answer for the sum variable is: 80.
+gPrintln("greg")  // Just prints like normal
+
+// 
+var message2 = message1.lower()  // uses message1 as it's own variable now
+gPrintln(message2) // prints: greg
