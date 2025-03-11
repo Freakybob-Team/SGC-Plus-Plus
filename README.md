@@ -2,40 +2,42 @@
 
 A remake of SigmaGreg.
 
-## ToDo List:
-- Variables
-- Functions
-- If statements
-- While loops
-- For loops
-- Input
-- Output
-- Comments
-- Error handling
-- Every fucking thing
+## To-Do List:
 
-## Syntax that I want to implement:
+- [x] Variables
+- [ ] Functions
+- [ ] If statements
+- [ ] While loops
+- [ ] For loops
+- [x] Input
+- [x] Output
+- [x] Comments
+- [ ] Error handling
+- [ ] Every fucking thing
+
+## Better Syntax
+**Just look at this!!!**
 
 ```
-var name = gReadln("What's your name? ")
-    
-if (name == "Greg") then
-    gPrintln("greg..")
-else
-    gPrintln(a"Hello @name")
-end if
+var name = gReadln("What is your name? ")
+var change_name = name.lower() // change the variable to lowercase
+gPrintln(f"Hai {change_name}! I hope you're having a good day :3")
+
+// random ass math
+gPrintln(2 + 2)
+
 ```
 
 ---
 
-# Why will this be better?
+
+# Why is this better?
 
   **First of all:**
 
-  - SigmaGreg is ass and needs to be fixed
-  - Everything in the old SigmaGreg just has greg in it. I want to make it so it's more easier to learn
-  - Will bring REAL if statements, functions and more!
-  - More unique
+  - SigmaGreg had ass syntax, you could barely do anything and there were so many things that was bad about it. SGC++ will fix all of that.
+  - Nicer looking keywords (eg: ```gPrintln()```) unlike the original SigmaGreg Code (eg: ```gregPr```)
+  - Not as buggy!!!
 
 ---
 
@@ -45,12 +47,6 @@ end if
   > gPrintln() is how you would print, just like `gregPr`.
 ### gReadln()
   > gReadln() is how you take input. It's the exact same as `gregIn`
-### @
-  > Will be used like how SigmaGreg did ```gregPr f"hello {name}!"``` but instead as ```gPrintln(a"Hello @name!")```.
-# Why should I be happy about this?
-
-  **I don't fucking know, all I know is that I'm gonna make it have more features and be more better.**
-
 
 ---
 
