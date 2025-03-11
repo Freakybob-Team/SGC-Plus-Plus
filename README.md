@@ -25,7 +25,24 @@ gPrintln(f"Hai {change_name}! I hope you're having a good day :3")
 
 // random ass math
 gPrintln(2 + 2)
+```
 
+**WAY better than SigmaGreg's syntax..**
+
+```
+credit_number:
+ssn:
+credit_num_back:
+
+gregPr "I need your credit card number to make sure you not hacked\n"
+gregIn credit_number
+gregPr "Thank you, now I need your social security to make sure to identity fraud\n"
+gregIn ssn
+gregPr "thank you, now I need 3 number on back to make sure your bank account safe\n"
+gregIn credit_num_back
+
+gregPr f"Ok so I have {credit_number}, {ssn}, and {credit_num_back}\n"
+gregPr "ghahahaha you have been hacked hahgahgahah" 
 ```
 
 ---
