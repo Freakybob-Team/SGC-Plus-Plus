@@ -1,7 +1,7 @@
 /*
 Test.sgc
 
-The official test file for SGC++.
+The official first test file for SGC++.
 
 This script will test out some of the first features we currently have (Mar 10, 11:12 PM).
 Please note that this is in beta, and performance might be a bit buggy.
