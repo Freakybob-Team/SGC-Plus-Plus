@@ -20,12 +20,19 @@ A remake of SigmaGreg.
 **Just look at this!!!**
 
 ```
-var name = gReadln("What is your name? ")
-var change_name = name.lower() // change the variable to lowercase
-gPrintln(f"Hai {change_name}! I hope you're having a good day :3")
+// hahaha get hacked loser
+gPrintln("I need your credit card number to make sure you not hacked\n")
+var credit_number = gReadln(">> ")
 
-// random ass math
-gPrintln(2 + 2)
+gPrintln("Thank you, now I need your social security to make sure to identity fraud\n")
+var ssn = gReadln(">> ")
+
+gPrintln("thank you, now I need 3 number on back to make sure your bank account safe\n")
+var credit_num_back = gReadln(">> ")
+
+gPrintln(f"Ok so I have {credit_number}, {ssn}, and {credit_num_back}\n")
+
+gPrintln("ghahahaha you have been hacked hahgahgahah")
 ```
 
 **WAY better than SigmaGreg's syntax..**
