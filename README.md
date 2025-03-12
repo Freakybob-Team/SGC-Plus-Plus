@@ -13,6 +13,7 @@ A remake of SigmaGreg.
 - [x] Output
 - [x] Comments
 - [ ] Error handling
+- [ ] Move to-do items to individual GitHub issues
 - [ ] Every fucking thing
 
 ## Better Syntax
