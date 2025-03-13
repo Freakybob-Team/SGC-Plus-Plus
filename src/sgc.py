@@ -7,7 +7,7 @@ This module provides a simple interface for interacting with the SGC++ language.
 import re
 from operations import gPrintln, gReadln
 from utils import evaluate_expression
-
+import importlib
 class interpreter:
     def __init__(self):
         self.variables = {}
@@ -26,7 +26,15 @@ class interpreter:
 
             if not line:
                 continue
-
+            if line.startswith("import "):
+                module_name = line.split(" ")[1]
+                try:
+                    self.variables[module_name] = importlib.import_module(module_name)
+                    print(f"\033[32m[SUCCESS] Imported module '{module_name}'\033[0m")
+                except Exception as e:
+                    print(f"\033[31m[ERROR] Failed to import '{module_name}': {e}\033[0m")
+                continue 
+            
             var_match = re.match(r'var\s+(\w+)\s*=\s*(.*)', line)
             if var_match:
                 var_name, expr = var_match.groups()
@@ -48,7 +56,12 @@ class interpreter:
                 except Exception as e:
                     print(f"\033[31m[ERROR] Error on line {line_num}: {e} \033[0m")
                     continue
-
+            elif re.match(r'^\w+\.\w+\(.*\)$', line): 
+                try:
+                    evaluate_expression(line, self.variables)
+                except Exception as e:
+                    print(f"\033[31m[ERROR] Error on line {line_num}: {e} \033[0m")
+                continue
             elif line.startswith("gPrintln"):
                 content = re.match(r'gPrintln\((.*?)\)', line).group(1).strip()
                 gPrintln(content, self.variables)
