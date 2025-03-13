@@ -12,9 +12,12 @@ A remake of SigmaGreg.
 - [x] Input
 - [x] Output
 - [x] Comments
-- [ ] Error handling
+- [x] Error handling
 - [ ] Move to-do items to individual GitHub issues <!-- grrr -->
+- [x] Python modules
+- [x] Lists 
 - [ ] Every fucking thing
+
 
 ## Better Syntax
 **Just look at this!!!**
