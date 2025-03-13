@@ -9,15 +9,16 @@ This module provides functions for performing operations in SGC++. The functions
 from utils import evaluate_expression
 
 def gPrintln(text, variables):
-    result = variables.get(text, None) if text in variables else evaluate_expression(text, variables)
+    if text.startswith('f') and '{' in text and '}' in text:
+        try:
+            result = eval(text, {}, variables)
+        except SyntaxError as e:
+            print(f"Error processing f-string: {e}")
+            return None
+    else:
+        result = variables.get(text, None) if text in variables else evaluate_expression(text, variables)
 
     if result is not None:
-        if isinstance(result, str) and '{' in result and '}' in result:
-            try:
-                result = eval(f"f'''{result}'''", {}, variables)
-            except SyntaxError as e:
-                print(f"Error processing f-string: {e}")
-                return None
         print(result)
         return result
     else:
