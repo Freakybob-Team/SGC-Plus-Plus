@@ -1,0 +1,21 @@
+/*
+SGC++
+
+Importing Python Modules.
+
+March 12th 2025, 11: 48 PM
+
+*/
+
+// Import datetime
+import datetime
+
+// the variables
+var now = datetime.datetime.now()
+var year = now.year
+var month = now.month
+var day = now.day
+var hour = now.hour
+var minute = now.minute
+var result = f"Current date and time: {month}/{day}/{year} {hour}:{minute}"
+gPrintln(result)
