@@ -13,7 +13,7 @@ def gPrintln(text, variables):
         try:
             result = eval(text, {}, variables)
         except SyntaxError as e:
-            print(f"Error processing f-string: {e}")
+            print(f"\033[31m[ERROR] Error processing f-string: {e}\033[0m")
             return None
     else:
         result = variables.get(text, None) if text in variables else evaluate_expression(text, variables)
@@ -22,7 +22,7 @@ def gPrintln(text, variables):
         print(result)
         return result
     else:
-        print(f"Error: Could not evaluate '{text}'")
+        print(f"\033[31m[ERROR] Error: Could not evaluate '{text}' \033[0m")
         return None
 
 
