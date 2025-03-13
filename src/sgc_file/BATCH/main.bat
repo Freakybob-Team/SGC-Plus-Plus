@@ -20,7 +20,7 @@ if %errorlevel% neq 0 (
     exit /b
 )
 
-set /p exe_path="Enter the full path to the executable (.exe) for SigmaGreg: "
+set /p exe_path="Enter the full path to the executable (.exe) for SGC++: "
 set /p ico_path="Enter the full path to the icon (.ico) for .sgc files: "
 
 if not exist "%exe_path%" (
