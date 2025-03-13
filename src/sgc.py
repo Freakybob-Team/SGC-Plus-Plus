@@ -31,7 +31,9 @@ class interpreter:
             if var_match:
                 var_name, expr = var_match.groups()
                 try:
-                    if expr.startswith("gPrintln"):
+                    if expr.startswith("["):
+                        self.variables[var_name] = eval(expr)
+                    elif expr.startswith("gPrintln"):
                         content = re.match(r'gPrintln\((.*?)\)', expr).group(1).strip()
                         self.variables[var_name] = gPrintln(content, self.variables)
                     elif expr.startswith("gReadln"):
@@ -42,9 +44,9 @@ class interpreter:
                         if result is not None:
                             self.variables[var_name] = result
                         else:
-                            raise ValueError(f"Invalid expression in assignment: {expr}")
+                            raise ValueError(f"\033[31m[ERROR] Invalid expression in assignment: {expr}\033[0m")
                 except Exception as e:
-                    print(f"Error on line {line_num}: {e}")
+                    print(f"\033[31m[ERROR] Error on line {line_num}: {e} \033[0m")
                     continue
 
             elif line.startswith("gPrintln"):
@@ -56,7 +58,7 @@ class interpreter:
                 gReadln(prompt, self.variables)
 
             else:
-                print(f"Syntax Error on line {line_num}: Unrecognized statement: {line}")
+                print(f"\033[31m[ERROR] Syntax Error on line {line_num}: Unrecognized statement: {line} \033[0m")
 
     def run_file(self, filename):
         if filename.endswith(".sgc"):
@@ -65,8 +67,8 @@ class interpreter:
                     code = file.read()
                     self.execute(code)
             except FileNotFoundError:
-                print(f"Error: File '{filename}' not found...")
+                print(f"\033[31m[ERROR] Error: File '{filename}' not found...\033[0m")
             except Exception as e:
-                print(f"Error reading file '{filename} :c': {e}")
+                print(f"\033[31m[ERROR] Error reading file '{filename} :c': {e} \033[0m")
         else:
-            print("what.. this isn't sgc.. sob.. (Use a .sgc file plz :3)")
+            print("\033[33m[WARNING] what.. this isn't sgc.. sob.. (Use a .sgc file plz :3)\033[0m")
