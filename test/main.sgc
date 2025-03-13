@@ -10,6 +10,8 @@ Please note that this is in beta, and performance might be a bit buggy.
 // Declare variables for testing
 var sum = 40 * 2  // 40 * 2
 var message1 = "greg".upper()  // convert 'greg' to uppercase
+var names = ["Sigma", "Squirrel", "Wish", "Names", "Hyper :3", "uhh peak"]
+
 
 // demonstrate string manipulation in SGC++ (e.g., .upper(), .lower(), etc.)
 // Note: You can't use methods like .upper() directly in gPrintln() f-strings (e.g., gPrintln(f"greg: {greg.upper()}"))
@@ -19,8 +21,17 @@ gPrintln(message1)  // Should print: GREG
 // Testing basic math and string operations with gPrintln()
 gPrintln(1 + 2)  // Should print: 3 (basic addition)
 gPrintln(f"The answer for the sum variable is: {sum}.")  // Should print: The answer for the sum variable is: 80.
-gPrintln("greg")  // Just prints like normal
+gPrintln("SGC++ peak")  // Just prints like normal
 
 // 
 var message2 = message1.lower()  // uses message1 as it's own variable now
 gPrintln(message2) // prints: greg
+gPrintln("\n")
+
+// list printing
+gPrintln("\ntesting list print rgeg:")
+gPrintln(names[0])
+gPrintln(names[1])
+gPrintln(names[3])
+gPrintln(names[4])
+gPrintln(names[5])
