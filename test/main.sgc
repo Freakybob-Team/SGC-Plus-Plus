@@ -6,6 +6,7 @@ The official first test file for SGC++.
 This script will test out some of the first features we currently have (Mar 10, 11:12 PM).
 Please note that this is in beta, and performance might be a bit buggy.
 */
+import time
 
 // Declare variables for testing
 var sum = 40 * 2  // 40 * 2
@@ -18,15 +19,19 @@ var names = ["Sigma", "Squirrel", "Wish", "Names", "Hyper :3", "uhh peak"]
 // this needs to be done separately or via a variable assignment.
 gPrintln(message1)  // Should print: GREG
 
+var sleep = time.sleep(2)
 // Testing basic math and string operations with gPrintln()
 gPrintln(1 + 2)  // Should print: 3 (basic addition)
 gPrintln(f"The answer for the sum variable is: {sum}.")  // Should print: The answer for the sum variable is: 80.
 gPrintln("SGC++ peak")  // Just prints like normal
 
 // 
+var sleep = time.sleep(2)
 var message2 = message1.lower()  // uses message1 as it's own variable now
 gPrintln(message2) // prints: greg
 gPrintln("\n")
+
+var sleep = time.sleep(2)
 
 // list printing
 gPrintln("\ntesting list print rgeg:")
@@ -35,3 +40,5 @@ gPrintln(names[1])
 gPrintln(names[3])
 gPrintln(names[4])
 gPrintln(names[5])
+
+
