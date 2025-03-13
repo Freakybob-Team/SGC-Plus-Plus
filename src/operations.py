@@ -2,8 +2,8 @@
 SGC++ Operations
 
 This module provides functions for performing operations in SGC++. The functions include:
-- `gPrintln`: Prints a message to the console, handling escape sequences like `\n`, `\"`, etc., and also supporting f-strings.
-- `gReadln`: Reads a line of input from the user and updates the associated variable with the input.
+- gPrintln: Prints a message to the console, handling escape sequences like \n, \", etc., and also supporting f-strings.
+- gReadln: Reads a line of input from the user and updates the associated variable with the input.
 """
 
 from utils import evaluate_expression
