@@ -14,3 +14,5 @@ if __name__ == "__main__":
         input("Press enter to exit..")
     else:
         print("\033[33m[WARNING] Uhh so no file, use like: python main.py filename.sgc\033[0m")
+        print("----------------------------------------------")
+        input("Press enter to exit..")
