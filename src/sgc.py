@@ -10,7 +10,7 @@ from utils import evaluate_expression
 import importlib
 class interpreter:
     def __init__(self):
-        self.variables = {"Math": Math}
+        self.variables = {}
 
     def remove_comments(self, code):
         code = re.sub(r'//.*', '', code)
