@@ -6,12 +6,19 @@ This module provides functions for performing operations in SGC++. The functions
 - gReadln: Reads a line of input from the user and updates the associated variable with the input.
 """
 
+import random
 from utils import evaluate_expression
+
+class Math:
+    def random():
+        value = random.random()
+        print(f"{value}")
+        
 
 def gPrintln(text, variables):
     if text.startswith('f') and '{' in text and '}' in text:
         try:
-            result = eval(text, {}, variables)
+            result = eval(text[1:], {}, variables)
         except SyntaxError as e:
             print(f"\033[31m[ERROR] Error processing f-string: {e}\033[0m")
             return None
