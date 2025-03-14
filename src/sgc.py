@@ -10,7 +10,7 @@ from utils import evaluate_expression
 import importlib
 class interpreter:
     def __init__(self):
-        self.variables = {}
+        self.variables = {"Math": Math}
 
     def remove_comments(self, code):
         code = re.sub(r'//.*', '', code)
@@ -36,6 +36,7 @@ class interpreter:
                 continue 
             
             var_match = re.match(r'var\s+(\w+)\s*=\s*(.*)', line)
+            let_match = re.match(r'let\s+(\w+)\s*=\s*(.*)', line)
             if var_match:
                 var_name, expr = var_match.groups()
                 try:
@@ -51,6 +52,26 @@ class interpreter:
                         result = evaluate_expression(expr, self.variables)
                         if result is not None:
                             self.variables[var_name] = result
+                        else:
+                            raise ValueError(f"\033[31m[ERROR] Invalid expression in assignment: {expr}\033[0m")
+                except Exception as e:
+                    print(f"\033[31m[ERROR] Error on line {line_num}: {e} \033[0m")
+                    continue
+            elif let_match:
+                let_name, expr = let_match.groups()
+                try:
+                    if expr.startswith("["):
+                        self.variables[let_name] = eval(expr)
+                    elif expr.startswith("gPrintln"):
+                        content = re.match(r'gPrintln\((.*?)\)', expr).group(1).strip()
+                        self.variables[let_name] = gPrintln(content, self.variables)
+                    elif expr.startswith("gReadln"):
+                        prompt = re.match(r'gReadln\((.*?)\)', expr).group(1).strip()
+                        self.variables[let_name] = gReadln(prompt, self.variables)
+                    else:
+                        result = evaluate_expression(expr, self.variables)
+                        if result is not None:
+                            self.variables[let_name] = result
                         else:
                             raise ValueError(f"\033[31m[ERROR] Invalid expression in assignment: {expr}\033[0m")
                 except Exception as e:
