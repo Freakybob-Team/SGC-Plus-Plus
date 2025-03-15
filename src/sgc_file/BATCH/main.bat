@@ -8,7 +8,7 @@ call clean.bat
 echo ===================================================================
 echo For this to work, you need to run this program as Administrator.
 echo Don't worry, this script does nothing harmful to your device! :3
-echo It simply provides the necessary support for SGC++ (.sgc) files.
+echo It simply provides the necessary support for SGC++ (.sgcx) files.
 echo ===================================================================
 
 pause
@@ -35,12 +35,12 @@ if not exist "%ico_path%" (
     exit /b
 )
 
-assoc .sgc=SGC++
+assoc .sgcx=SGC++
 ftype SGC++="%exe_path%" "%%1"
-echo File association created for .sgc with "%exe_path%"!
+echo File association created for .sgcx with "%exe_path%"!
 
 reg add "HKCR\SGC++\DefaultIcon" /ve /t REG_SZ /d "%ico_path%" /f
-echo Icon set for .sgc files!
+echo Icon set for .sgcx files!
 
 echo ===========================================================
 echo All operations completed successfully! You can now open .sgc files with SGC++. Enjoy! :3
