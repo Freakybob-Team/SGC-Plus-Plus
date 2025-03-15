@@ -30,7 +30,6 @@ class interpreter:
                 module_name = line.split(" ")[1]
                 try:
                     self.variables[module_name] = importlib.import_module(module_name)
-                    print(f"\033[32m[SUCCESS] Imported module '{module_name}'\033[0m")
                 except Exception as e:
                     print(f"\033[31m[ERROR] Failed to import '{module_name}': {e}\033[0m")
                 continue 
