@@ -1,7 +1,7 @@
 """
 SGC++
 
-This module provides a simple interface for interacting with the SGC++ language. It includes methods for executing SGC++ code, handling variables, removing comments and if statements.
+This module provides a simple interface for interacting with the SGC++ language. It includes methods for executing SGC++ code, handling variables, and removing comments.
 """
 import re
 from operations import gPrintln, gReadln
@@ -120,7 +120,7 @@ class interpreter:
                 continue
 
     def run_file(self, filename):
-        if filename.endswith(".sgc"):
+        if filename.endswith(".sgcx"):
             try:
                 with open(filename, "r") as file:
                     code = file.read()
@@ -132,4 +132,4 @@ class interpreter:
             except Exception as e:
                 print(f"\033[31m[ERROR] Error reading file '{filename} :c': {e} \033[0m")
         else:
-            print("\033[33m[WARNING] what.. this isn't sgc.. sob.. (Use a .sgc file plz :3)\033[0m")
+            print("\033[33m[WARNING] what.. this isn't sgc++.. sob.. (Use a .sgc file plz :3)\033[0m")
