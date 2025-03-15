@@ -100,6 +100,8 @@ class interpreter:
                 with open(filename, "r") as file:
                     code = file.read()
                     self.execute(code)
+                    if not code.strip():
+                        print("\033[33m[WARNING] File is empty.. add some code!\033[0m")
             except FileNotFoundError:
                 print(f"\033[31m[ERROR] Error: File '{filename}' not found...\033[0m")
             except Exception as e:
