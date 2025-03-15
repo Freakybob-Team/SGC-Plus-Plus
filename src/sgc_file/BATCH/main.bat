@@ -21,7 +21,7 @@ if %errorlevel% neq 0 (
 )
 
 set /p exe_path="Enter the full path to the executable (.exe) for SGC++: "
-set /p ico_path="Enter the full path to the icon (.ico) for .sgc files: "
+set /p ico_path="Enter the full path to the icon (.ico) for .sgcx files: "
 
 if not exist "%exe_path%" (
     echo ERROR: The specified executable path does not exist! Please check the path and try again.
@@ -43,7 +43,7 @@ reg add "HKCR\SGC++\DefaultIcon" /ve /t REG_SZ /d "%ico_path%" /f
 echo Icon set for .sgcx files!
 
 echo ===========================================================
-echo All operations completed successfully! You can now open .sgc files with SGC++. Enjoy! :3
+echo All operations completed successfully! You can now open .sgcx files with SGC++. Enjoy! :3
 echo ===========================================================
 
 pause
