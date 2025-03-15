@@ -132,4 +132,4 @@ class interpreter:
             except Exception as e:
                 print(f"\033[31m[ERROR] Error reading file '{filename} :c': {e} \033[0m")
         else:
-            print("\033[33m[WARNING] what.. this isn't sgc++.. sob.. (Use a .sgc file plz :3)\033[0m")
+            print("\033[33m[WARNING] what.. this isn't sgc++.. sob.. (Use a .sgcx file plz :3)\033[0m")
