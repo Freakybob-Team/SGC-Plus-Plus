@@ -11,7 +11,7 @@ if %errorlevel% neq 0 (
     )
 )
 
-set /p pythonPath=Enter the full path to the Python file: 
+set /p pythonPath=Enter the full path to the main.py file: 
 set /p icoPath=Enter the full path to the icon file: 
 
 if not exist "%pythonPath%" (
