@@ -1,0 +1,6 @@
+var num = 50
+if (49 > num) then
+    gPrintln("wow")
+else
+    gPrintln(f"NJOOO {num}")
+end
