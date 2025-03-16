@@ -4,17 +4,17 @@ A remake of SigmaGreg.
 
 ## To-Do List:
 
-- [x] Variables
+- [x] Variables (kinda done)
 - [ ] Functions
-- [ ] If statements
+- [x] If statements (kinda done)
 - [ ] While loops
 - [ ] For loops
 - [x] Input
 - [x] Output
 - [x] Comments
-- [x] Error handling
+- [x] Error handling (kinda done)
 - [ ] Move to-do items to individual GitHub issues <!-- grrr -->
-- [x] Python modules
+- [x] Python modules (kinda done)
 - [x] Lists 
 - [ ] Every fucking thing
 
