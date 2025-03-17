@@ -3,6 +3,7 @@ SGC++
 
 This module provides a simple interface for interacting with the SGC++ language. It includes methods for executing SGC++ code, handling variables, and removing comments.
 """
+import sys
 import re
 from operations import gPrintln, gReadln
 from utils import evaluate_expression
@@ -52,6 +53,14 @@ class interpreter:
                     print(f"\033[31m[ERROR] Failed to import '{module_name}': {e}\033[0m")
                 i += 1
                 continue
+                
+            if line.startswith("exit("):
+                match = re.match(r'exit\((\d+)\)', line.strip())
+                if match:
+                    exit_code = int(match.group(1))
+                    sys.exit(exit_code)
+                else:
+                    sys.exit(0)
 
             if_match = re.match(r'if \((.*?)\) then', line)
             if if_match:
