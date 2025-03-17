@@ -23,19 +23,21 @@ A remake of SigmaGreg.
 **Just look at this!!!**
 
 ```
-// hahaha get hacked loser
-gPrintln("I need your credit card number to make sure you not hacked\n")
-var credit_number = gReadln(">> ")
+// the original variable
+var what = gReadln("is names gay y/n")
+var change_what = what.lower() // change the variable to lowercase
 
-gPrintln("Thank you, now I need your social security to make sure to identity fraud\n")
-var ssn = gReadln(">> ")
+if (change_what == "y") then
+    var gay = True
+else
+    var gay = False
+end
 
-gPrintln("thank you, now I need 3 number on back to make sure your bank account safe\n")
-var credit_num_back = gReadln(">> ")
-
-gPrintln(f"Ok so I have {credit_number}, {ssn}, and {credit_num_back}\n")
-
-gPrintln("ghahahaha you have been hacked hahgahgahah")
+if (gay) then
+    gPrintln("geg")
+else
+    gPrintln("ok")
+end
 ```
 
 **WAY better than SigmaGreg's syntax..**
