@@ -70,29 +70,30 @@ class interpreter:
                     print(f"\033[31m[ERROR] Error evaluating if condition: {e}\033[0m")
                     return
 
-            var_match = re.match(r'var\s+(\w+)\s*=\s*(.*)', line)
-            let_match = re.match(r'let\s+(\w+)\s*=\s*(.*)', line)
-            if var_match or let_match:
-                var_name, expr = (var_match or let_match).groups()
+            assign_match = re.match(r'(?:var|let)?\s*(\w+)\s*=\s*(.*)', line)
+            if assign_match:
+                var_name, expr = assign_match.groups()
                 try:
-                    if expr.startswith("["):
-                        self.variables[var_name] = eval(expr)
-                    elif expr.startswith("gPrintln"):
-                        content = re.match(r'gPrintln\((.*?)\)', expr).group(1).strip()
-                        self.variables[var_name] = gPrintln(content, self.variables)
-                    elif expr.startswith("gReadln"):
-                        prompt = re.match(r'gReadln\((.*?)\)', expr).group(1).strip()
-                        self.variables[var_name] = gReadln(prompt, self.variables)
-                    else:
-                        result = evaluate_expression(expr, self.variables)
-                        if result is not None:
-                            self.variables[var_name] = result
+                    if self.variables.get(var_name, None) is not None or line.startswith(("var ", "let ")):  # Allow reassignment
+                        if expr.startswith("["):
+                            self.variables[var_name] = eval(expr)
+                        elif expr.startswith("gPrintln"):
+                            content = re.match(r'gPrintln\((.*?)\)', expr).group(1).strip()
+                            self.variables[var_name] = gPrintln(content, self.variables)
+                        elif expr.startswith("gReadln"):
+                            prompt = re.match(r'gReadln\((.*?)\)', expr).group(1).strip()
+                            self.variables[var_name] = gReadln(prompt, self.variables)
                         else:
-                            raise ValueError(f"\033[31m[ERROR] Invalid expression in assignment: {expr}\033[0m")
+                            result = evaluate_expression(expr, self.variables)
+                            if result is not None:
+                                self.variables[var_name] = result
+                            else:
+                                raise ValueError(f"\033[31m[ERROR] Invalid expression in assignment: {expr}\033[0m")
                 except Exception as e:
                     print(f"\033[31m[ERROR] Error on line {i+1}: {e} \033[0m")
                 i += 1
                 continue
+
 
             elif re.match(r'^\w+\.\w+\(.*\)$', line): 
                 try:
