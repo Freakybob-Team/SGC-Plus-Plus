@@ -13,9 +13,25 @@ class interpreter:
         self.variables = {}
 
     def remove_comments(self, code):
+        string_pattern = r'(\".*?\"|\'.*?\')'
+
+        string_matches = list(re.finditer(string_pattern, code))
+        string_placeholders = {}
+
+
+        for i, match in enumerate(string_matches):
+            placeholder = f"__STRING_PLACEHOLDER_{i}__"
+            string_placeholders[placeholder] = match.group(0)
+            code = code.replace(match.group(0), placeholder, 1)
+
         code = re.sub(r'//.*', '', code)
         code = re.sub(r'/\*.*?\*/', '', code, flags=re.DOTALL)
+
+        for placeholder, original in string_placeholders.items():
+            code = code.replace(placeholder, original, 1)
+
         return code
+
 
     def execute(self, code):
         code = self.remove_comments(code)
@@ -95,7 +111,7 @@ class interpreter:
                 continue
 
 
-            elif re.match(r'^\w+\.\w+\(.*\)$', line): 
+            elif re.match(r'^\w+\.\w+\(.*\)', line): 
                 try:
                     evaluate_expression(line, self.variables)
                 except Exception as e:
