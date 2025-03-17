@@ -1,0 +1,8 @@
+import random
+
+var names = ["Squirrel", "Names", "Lux", "Noma", "Wish", "Mpax"]
+var uh = ["Stinky", "Peak", "Good Dev", "ASS DEV", "Always zesty..", "gay"]
+var choice_name = random.choice(names)
+var choice_uh = random.choice(uh)
+
+gPrintln(f"{choice_name} is: {choice_uh}")
