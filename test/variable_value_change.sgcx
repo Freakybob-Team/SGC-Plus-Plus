@@ -1,0 +1,9 @@
+import time // Imports time
+var greg = "greg3333" // original variable value
+
+gPrintln(f"\"greg\" before value change: {greg}")
+time.sleep(1) // sleep
+greg = "pizza" // changes greg to pizza
+
+gPrintln(f"The \"greg\" variable after change: {greg}")
+
