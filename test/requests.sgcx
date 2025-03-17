@@ -1,0 +1,12 @@
+import requests
+
+var url = "https://api.github.com/repos/5quirre1/Python/contents/Daily"
+
+var response = requests.get(url)
+var json = response.json()
+if (response.status_code == 200) then
+    gPrintln("peak")
+    gPrintln(json)
+else
+    gPrintln("uh oh")
+end
