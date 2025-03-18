@@ -1,0 +1,11 @@
+A simple SGC++ program:
+// *******************************************
+    var name = gReadln("what is your name:")
+    var change = name.lower()
+    var name = change
+    if (name == "greg") then
+        gPrintln("GREG!!!!!")
+    else
+        gPrintln(f"Hai {name}!!!")
+    end
+// *******************************************
