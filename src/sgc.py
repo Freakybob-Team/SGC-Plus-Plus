@@ -12,13 +12,23 @@ import importlib
 class interpreter:
     def __init__(self):
         self.variables = {}
+        self.builtins = {
+            'str': str,
+            'int': int,
+            'float': float,
+            'bool': bool,
+            'len': len,
+            'abs': abs,
+            'min': min,
+            'max': max,
+            'sum': sum,
+            'round': round
+        }
 
     def remove_comments(self, code):
         string_pattern = r'(\".*?\"|\'.*?\')'
-
         string_matches = list(re.finditer(string_pattern, code))
         string_placeholders = {}
-
 
         for i, match in enumerate(string_matches):
             placeholder = f"__STRING_PLACEHOLDER_{i}__"
@@ -32,7 +42,6 @@ class interpreter:
             code = code.replace(placeholder, original, 1)
 
         return code
-
 
     def execute(self, code):
         code = self.remove_comments(code)
@@ -53,7 +62,7 @@ class interpreter:
                     print(f"\033[31m[ERROR] Failed to import '{module_name}': {e}\033[0m")
                 i += 1
                 continue
-                
+            
             if line.startswith("exit("):
                 match = re.match(r'exit\((\d+)\)', line.strip())
                 if match:
@@ -72,9 +81,21 @@ class interpreter:
                     inside_if_block = []
                     i += 1
 
-                    while i < len(lines) and not re.match(r'^(else|end)$', lines[i].strip()):
+                    while i < len(lines) and not re.match(r'^(elif|else|end)$', lines[i].strip()):
                         inside_if_block.append(lines[i])
                         i += 1
+
+                    elif_blocks = []
+                    while i < len(lines) and lines[i].strip().startswith("elif"):
+                        elif_match = re.match(r'elif \((.*?)\) then', lines[i].strip())
+                        if elif_match:
+                            elif_condition = elif_match.group(1)
+                            i += 1
+                            elif_body = []
+                            while i < len(lines) and not re.match(r'^(elif|else|end)$', lines[i].strip()):
+                                elif_body.append(lines[i])
+                                i += 1
+                            elif_blocks.append((elif_condition, elif_body))
 
                     else_block = []
                     if i < len(lines) and lines[i].strip() == "else":
@@ -88,37 +109,46 @@ class interpreter:
                     
                     if condition_result:
                         self.execute("\n".join(inside_if_block))
-                    elif else_block:
-                        self.execute("\n".join(else_block))
+                    else:
+                        for elif_condition, elif_body in elif_blocks:
+                            if evaluate_expression(elif_condition, self.variables):
+                                self.execute("\n".join(elif_body))
+                                break
+                        else:
+                            if else_block:
+                                self.execute("\n".join(else_block))
                     continue
                 except Exception as e:
                     print(f"\033[31m[ERROR] Error evaluating if condition: {e}\033[0m")
                     return
 
-            assign_match = re.match(r'(?:var|let)?\s*(\w+)\s*=\s*(.*)', line)
+            assign_match = re.match(r'(var|let)\s*(\w+)\s*=\s*(.*)', line)
             if assign_match:
-                var_name, expr = assign_match.groups()
+                _, var_name, expr = assign_match.groups()
                 try:
-                    if self.variables.get(var_name, None) is not None or line.startswith(("var ", "let ")):  # Allow reassignment
-                        if expr.startswith("["):
-                            self.variables[var_name] = eval(expr)
-                        elif expr.startswith("gPrintln"):
-                            content = re.match(r'gPrintln\((.*?)\)', expr).group(1).strip()
-                            self.variables[var_name] = gPrintln(content, self.variables)
-                        elif expr.startswith("gReadln"):
-                            prompt = re.match(r'gReadln\((.*?)\)', expr).group(1).strip()
-                            self.variables[var_name] = gReadln(prompt, self.variables)
+                    if expr.startswith("["):
+                        self.variables[var_name] = eval(expr)
+                    elif expr.startswith("gPrintln"):
+                        content = re.match(r'gPrintln\((.*?)\)', expr).group(1).strip()
+                        self.variables[var_name] = gPrintln(content, self.variables)
+                    elif expr.startswith("gReadln"):
+                        prompt = re.match(r'gReadln\((.*?)\)', expr).group(1).strip()
+                        self.variables[var_name] = gReadln(prompt, self.variables)
+                    else:
+                        result = evaluate_expression(expr, {**self.variables, **self.builtins})
+                        if result is not None:
+                            self.variables[var_name] = result
                         else:
-                            result = evaluate_expression(expr, self.variables)
-                            if result is not None:
-                                self.variables[var_name] = result
-                            else:
-                                raise ValueError(f"\033[31m[ERROR] Invalid expression in assignment: {expr}\033[0m")
+                            raise ValueError(f"\033[31m[ERROR] Invalid expression in assignment: {expr}\033[0m")
                 except Exception as e:
                     print(f"\033[31m[ERROR] Error on line {i+1}: {e} \033[0m")
                 i += 1
                 continue
 
+            elif re.match(r'\w+\s*=\s*.*', line):
+                print(f"\033[31m[ERROR] Error on line {i+1}: Variables must be declared using 'let' or 'var'.\033[0m")
+                i += 1
+                continue
 
             elif re.match(r'^\w+\.\w+\(.*\)', line): 
                 try:
@@ -144,6 +174,7 @@ class interpreter:
                 print(f"\033[31m[ERROR] Syntax Error on line {i+1}: Unrecognized statement: {line} \033[0m")
                 i += 1
                 continue
+
 
     def run_file(self, filename):
         if filename.endswith(".sgcx"):
