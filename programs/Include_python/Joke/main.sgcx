@@ -1,0 +1,3 @@
+import greg // import the greg.py file
+
+greg.main() // run it
