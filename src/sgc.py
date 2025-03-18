@@ -75,27 +75,13 @@ class interpreter:
             if if_match:
                 condition = if_match.group(1)
                 try:
-                    condition_result = evaluate_expression(condition, self.variables)
-                    if isinstance(condition_result, str):
-                        condition_result = condition_result.strip('"') == "True"
+                    condition_result = bool(evaluate_expression(condition, self.variables))
                     inside_if_block = []
                     i += 1
 
-                    while i < len(lines) and not re.match(r'^(elif|else|end)$', lines[i].strip()):
+                    while i < len(lines) and not re.match(r'^(else|end)$', lines[i].strip()):
                         inside_if_block.append(lines[i])
                         i += 1
-
-                    elif_blocks = []
-                    while i < len(lines) and lines[i].strip().startswith("elif"):
-                        elif_match = re.match(r'elif \((.*?)\) then', lines[i].strip())
-                        if elif_match:
-                            elif_condition = elif_match.group(1)
-                            i += 1
-                            elif_body = []
-                            while i < len(lines) and not re.match(r'^(elif|else|end)$', lines[i].strip()):
-                                elif_body.append(lines[i])
-                                i += 1
-                            elif_blocks.append((elif_condition, elif_body))
 
                     else_block = []
                     if i < len(lines) and lines[i].strip() == "else":
@@ -109,14 +95,8 @@ class interpreter:
                     
                     if condition_result:
                         self.execute("\n".join(inside_if_block))
-                    else:
-                        for elif_condition, elif_body in elif_blocks:
-                            if evaluate_expression(elif_condition, self.variables):
-                                self.execute("\n".join(elif_body))
-                                break
-                        else:
-                            if else_block:
-                                self.execute("\n".join(else_block))
+                    elif else_block:
+                        self.execute("\n".join(else_block))
                     continue
                 except Exception as e:
                     print(f"\033[31m[ERROR] Error evaluating if condition: {e}\033[0m")
