@@ -1,0 +1,32 @@
+import random
+import time
+import os  
+
+// variables
+let answers = ["It is certain.", "It is decidedly so.", "Without a doubt.", "Yes, definitely.", "You may rely on it.", "As I see it, yes.", "Most likely.", "Outlook good.", "Yes.", "Reply hazy, try again.", "Ask again later.", "Better not tell you now.", "Cannot predict now.", "Concentrate and ask again.", "Don't count on it.", "My reply is no.", "My sources say no.", "Outlook not so good.", "Very doubtful."]
+let result = random.choice(answers)
+
+// start
+gPrintln("Welcome to 8 ball..\n")
+time.sleep(1)
+var question = gReadln("Ask a question [or type 'exit' to quit]: ").strip()
+
+// if statements for question
+if (not question) then
+    gPrintln("grrrr")
+    exit(1)
+end
+
+if (question.lower() == "exit") then
+    gPrintln("Bai bai!")
+    exit()
+end
+// end if statements
+
+// main
+gPrintln("thinking...")
+time.sleep(2)
+
+var clear_screen = os.system("cls" if (os.name == "nt") else "clear")
+time.sleep(1)
+gPrintln("Magic 8 ball says: " + result) // result!
