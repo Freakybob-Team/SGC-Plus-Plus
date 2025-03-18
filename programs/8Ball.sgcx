@@ -29,4 +29,5 @@ time.sleep(2)
 
 var clear_screen = os.system("cls" if (os.name == "nt") else "clear")
 time.sleep(1)
+gPrintln("Question: " + question)
 gPrintln("Magic 8 ball says: " + result) // result!
