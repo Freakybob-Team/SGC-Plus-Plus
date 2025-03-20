@@ -12,6 +12,7 @@ import importlib
 class interpreter:
     def __init__(self):
         self.variables = {}
+        self.constants = set()
         self.builtins = {
             'str': str,
             'int': int,
@@ -78,7 +79,7 @@ class interpreter:
                     print(f"\033[31m[ERROR] Failed to import '{module_name}': {e}\033[0m")
                 i += 1
                 continue
-            
+                
             
             for_match = re.match(r'for \((.*?)\) do', line)
             if for_match:
@@ -144,14 +145,31 @@ class interpreter:
                 except Exception as e:
                     print(f"\033[31m[ERROR] Error evaluating if condition: {e}\033[0m")
                     return
+            
+            
+            const_match = re.match(r'const\s*(\w+)\s*=\s*(.*)', line)
+            if const_match:
+                var_name, expr = const_match.groups()
+                if var_name in self.variables:
+                    print(f"\033[31m[ERROR] Cannot redefine existing variable or constant: {var_name}\033[0m")
+                else:
+                    try:
+                        result = evaluate_expression(expr, {**self.variables, **self.builtins})
+                        self.variables[var_name] = result
+                        self.constants.add(var_name)
+                    except Exception as e:
+                        print(f"\033[31m[ERROR] Error on line {i+1}: {e}\033[0m")
+                i += 1
+                continue
 
             assign_match = re.match(r'(var|let)\s*(\w+)\[(\d+)\]\s*=\s*(.*)', line)
             if assign_match:
                 _, var_name, index, expr = assign_match.groups()
                 try:
-     
                     index = int(index)
-                    if var_name in self.variables and isinstance(self.variables[var_name], list):
+                    if var_name in self.constants:
+                        print(f"\033[31m[ERROR] Cannot reassign constant '{var_name}'.\033[0m")
+                    elif var_name in self.variables and isinstance(self.variables[var_name], list):
                         list_var = self.variables[var_name]
                         if index < len(list_var):
                             result = evaluate_expression(expr, {**self.variables, **self.builtins})
@@ -164,36 +182,58 @@ class interpreter:
                     else:
                         print(f"\033[31m[ERROR] '{var_name}' is not a list or doesn't exist.\033[0m")
                 except Exception as e:
-                    print(f"\033[31m[ERROR] Error on line {i+1}: {e} \033[0m")
+                    print(f"\033[31m[ERROR] Error on line {i+1}: {e}\033[0m")
                 i += 1
                 continue
 
             assign_match = re.match(r'(var|let)\s*(\w+)\s*=\s*(.*)', line)
             if assign_match:
                 _, var_name, expr = assign_match.groups()
-                try:
-                    if expr.startswith("["):
-                        self.variables[var_name] = eval(expr)
-                    elif expr.startswith("gPrintln"):
-                        content = re.match(r'gPrintln\((.*?)\)', expr).group(1).strip()
-                        self.variables[var_name] = gPrintln(content, self.variables)
-                    elif expr.startswith("gReadln"):
-                        prompt = re.match(r'gReadln\((.*?)\)', expr).group(1).strip()
-                        self.variables[var_name] = gReadln(prompt, self.variables)
-                    else:
+                if var_name in self.variables:
+                    print(f"\033[31m[ERROR] Variable '{var_name}' already exists. Use simple assignment without 'var', 'let' or 'const'.\033[0m")
+                else:
+                    try:
+                        if expr.startswith("["):
+                            self.variables[var_name] = eval(expr)
+                        elif expr.startswith("gPrintln"):
+                            content = re.match(r'gPrintln\((.*?)\)', expr).group(1).strip()
+                            self.variables[var_name] = gPrintln(content, self.variables)
+                        elif expr.startswith("gReadln"):
+                            prompt = re.match(r'gReadln\((.*?)\)', expr).group(1).strip()
+                            self.variables[var_name] = gReadln(prompt, self.variables)
+                        else:
+                            result = evaluate_expression(expr, {**self.variables, **self.builtins})
+                            if result is not None:
+                                self.variables[var_name] = result
+                            else:
+                                raise ValueError(f"\033[31m[ERROR] Invalid expression in assignment: {expr}\033[0m")
+                    except Exception as e:
+                        print(f"\033[31m[ERROR] Error on line {i+1}: {e}\033[0m")
+                i += 1
+                continue
+
+            reassign_match = re.match(r'(\w+)\s*=\s*(.*)', line)
+            if reassign_match:
+                var_name, expr = reassign_match.groups()
+                if var_name in self.constants:
+                    print(f"\033[31m[ERROR] Cannot reassign constant '{var_name}'.\033[0m")
+                elif var_name not in self.variables:
+                    print(f"\033[31m[ERROR] Variable '{var_name}' does not exist. Declare it using 'let', 'var' or 'const'.\033[0m")
+                else:
+                    try:
                         result = evaluate_expression(expr, {**self.variables, **self.builtins})
                         if result is not None:
                             self.variables[var_name] = result
                         else:
-                            raise ValueError(f"\033[31m[ERROR] Invalid expression in assignment: {expr}\033[0m")
-                except Exception as e:
-                    print(f"\033[31m[ERROR] Error on line {i+1}: {e} \033[0m")
+                            print(f"\033[31m[ERROR] Invalid expression in assignment: {expr}\033[0m")
+                    except Exception as e:
+                        print(f"\033[31m[ERROR] Error on line {i+1}: {e}\033[0m")
                 i += 1
                 continue
 
 
             elif re.match(r'\w+\s*=\s*.*', line):
-                print(f"\033[31m[ERROR] Error on line {i+1}: Variables must be declared using 'let' or 'var'.\033[0m")
+                print(f"\033[31m[ERROR] Error on line {i+1}: Variables must be declared using 'let', 'var' or 'const'.\033[0m")
                 i += 1
                 continue
 
