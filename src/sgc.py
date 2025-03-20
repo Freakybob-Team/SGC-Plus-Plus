@@ -1,7 +1,7 @@
 """
 SGC++
 
-This module provides a simple interface for interacting with the SGC++ language. It includes methods for executing SGC++ code, handling variables, and removing comments.
+This module provides a simple interface for interacting with the SGC++ language. It includes methods for executing SGC++ code, if statements, while statements, for statements, handling variables, and removing comments.
 """
 import sys
 import re
@@ -54,6 +54,22 @@ class interpreter:
                 i += 1
                 continue
 
+            while_match = re.match(r'while \((.*?)\) do', line)
+            if while_match:
+                condition = while_match.group(1)
+                loop_body = []
+                i += 1
+
+                while i < len(lines) and lines[i].strip() != "end":
+                    loop_body.append(lines[i])
+                    i += 1
+
+                if i < len(lines) and lines[i].strip() == "end":
+                    i += 1
+
+                while bool(evaluate_expression(condition, self.variables)):
+                    self.execute("\n".join(loop_body))
+                continue
             if line.startswith("import "):
                 module_name = line.split(" ")[1]
                 try:
@@ -62,6 +78,33 @@ class interpreter:
                     print(f"\033[31m[ERROR] Failed to import '{module_name}': {e}\033[0m")
                 i += 1
                 continue
+            
+            
+            for_match = re.match(r'for \((.*?)\) do', line)
+            if for_match:
+                loop_parts = for_match.group(1).split(";")
+                if len(loop_parts) != 3:
+                    print(f"\033[31m[ERROR] Invalid for loop syntax on line {i+1}\033[0m")
+                    return
+
+                init, condition, update = loop_parts
+                self.execute(init.strip())
+
+                loop_body = []
+                i += 1
+
+                while i < len(lines) and lines[i].strip() != "end":
+                    loop_body.append(lines[i])
+                    i += 1
+
+                if i < len(lines) and lines[i].strip() == "end":
+                    i += 1
+
+                while bool(evaluate_expression(condition.strip(), self.variables)):
+                    self.execute("\n".join(loop_body))
+                    self.execute(update.strip())
+                continue
+
             
             if line.startswith("exit("):
                 match = re.match(r'exit\((\d+)\)', line.strip())
