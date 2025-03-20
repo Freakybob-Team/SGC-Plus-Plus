@@ -5,42 +5,88 @@ This shows off a lot of the features in one file.
 
 The official first test file for SGC++.
 
-This script will test out some of the first features we currently have (Mar 10, 11:12 PM).
+This script will test out some of the first features we currently have (Mar 20, 12:15 PM).
 Please note that this is in beta, and performance might be a bit buggy.
 */
+
 import time
+import math
+import random
 
 // Declare variables for testing
-var sum = 40 * 2  // 40 * 2
 var message1 = "greg".upper()  // convert 'greg' to uppercase
-var names = ["Sigma", "Squirrel", "Wish", "Names", "Hyper :3", "uhh peak"]
+var names = ["Sigma", "Squirrel", "Wish", "Names"   , "Hyper :3", "uhh peak"]
+var len = len(names)
+var message2 = message1.lower()
+var math = math.sqrt(5)
+var num1 = random.randint(1, 10)
+var num2 = random.randint(1, 10)
+var math_answer = num1 * num2
+var countdown_start = 10
 
-
-// demonstrate string manipulation in SGC++ (e.g., .upper(), .lower(), etc.)
-// Note: You can't use methods like .upper() directly in gPrintln() f-strings (e.g., gPrintln(f"greg: {greg.upper()}"))
-// this needs to be done separately or via a variable assignment.
+// ******************************************************************
+// Testing variable manipulation
+gPrintln("testing variable manipulation:")
+time.sleep(1)
 gPrintln(message1)  // Should print: GREG
-
-var sleep = time.sleep(2)
+gPrintln(message2) // should print: greg
+time.sleep(1)
+gPrintln(f"names list before change: {names}")
+// change the names values
+var names[0] = "greg"
+var names[1] = "greg2"
+var names[2] = "greg3"
+var names[3] = "greg4"
+var names[4] = "greg5"
+var names[5] = "greg6"
+time.sleep(1)
+// list is different now
+gPrintln(f"names list after change: {names}")
+gPrintln("=" * 50)
+time.sleep(1)
+// ******************************************************************
 // Testing basic math and string operations with gPrintln()
+gPrintln("testing math:")
 gPrintln(1 + 2)  // Should print: 3 (basic addition)
-gPrintln(f"The answer for the sum variable is: {sum}.")  // Should print: The answer for the sum variable is: 80.
-gPrintln("SGC++ peak")  // Just prints like normal
+gPrintln(f"The square root of 5 is: {math}")
+gPrintln(f"2 random numbers [1-10] multiply: {math_answer}")
+time.sleep(1)
+gPrintln("=" * 50)
+// ******************************************************************
+// testing for loops
+gPrintln("Printing list with for loop:")
+time.sleep(1)
+for (var i = 0; i < len; let i = i + 1) do
+    gPrintln(names[i])  // Print each item in the list
+end
+gPrintln("=" * 50)
+time.sleep(1)
+// ******************************************************************
+// testing while loops
+gPrintln("Testing while loops:")
+time.sleep(1)
+while (countdown_start > 0) do
+    gPrintln(countdown_start)
+    let countdown_start = countdown_start - 1
+    time.sleep(0.8)
+end
+gPrintln("greg")
+gPrintln("=" * 50)
+// ******************************************************************
+// testing if statements
+gPrintln("Testing if statements")
+time.sleep(1)
+var name_input = gReadln("What is ya name :3")
+var name_input = str(name_input)
+var name_input = name_input.lower()
+if (name_input == "greg") then
+    gPrintln("wow greg i'm a big fan")
+else
+    gPrintln(f"haii {name_input}!!!!!")
+end
+gPrintln("=" * 50)
+time.sleep(1)
 
-// 
-var sleep = time.sleep(2)
-var message2 = message1.lower()  // uses message1 as it's own variable now
-gPrintln(message2) // prints: greg
-gPrintln("\n")
 
-var sleep = time.sleep(2)
-
-// list printing
-gPrintln("\ntesting list print rgeg:")
-gPrintln(names[0])
-gPrintln(names[1])
-gPrintln(names[3])
-gPrintln(names[4])
-gPrintln(names[5])
 
 
