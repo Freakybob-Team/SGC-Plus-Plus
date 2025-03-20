@@ -1,0 +1,17 @@
+import random
+
+gPrintln("Welcome to the Math")
+let num1 = random.randint(1, 50000)
+let num2 = random.randint(1, 50001)
+
+let correct_answer = num1 * num2
+gPrintln(f"What is {num1} x {num2}?")
+
+let answer = gReadln("Your answer: ")
+let answer = int(answer)
+
+if (answer == correct_answer) then
+    gPrintln("nerd smh")
+else
+    gPrintln(f"hahaha dummy it was {correct_answer}")
+end
