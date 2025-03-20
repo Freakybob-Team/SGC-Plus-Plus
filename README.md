@@ -7,8 +7,8 @@ A remake of SigmaGreg.
 - [x] Variables (kinda done)
 - [ ] Functions
 - [x] If statements (kinda done)
-- [ ] While loops
-- [ ] For loops
+- [x] While loops (need more testing)
+- [x] For loops (need more testing)
 - [x] Input
 - [x] Output
 - [x] Comments
