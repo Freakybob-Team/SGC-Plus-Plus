@@ -145,6 +145,29 @@ class interpreter:
                     print(f"\033[31m[ERROR] Error evaluating if condition: {e}\033[0m")
                     return
 
+            assign_match = re.match(r'(var|let)\s*(\w+)\[(\d+)\]\s*=\s*(.*)', line)
+            if assign_match:
+                _, var_name, index, expr = assign_match.groups()
+                try:
+     
+                    index = int(index)
+                    if var_name in self.variables and isinstance(self.variables[var_name], list):
+                        list_var = self.variables[var_name]
+                        if index < len(list_var):
+                            result = evaluate_expression(expr, {**self.variables, **self.builtins})
+                            if result is not None:
+                                list_var[index] = result
+                            else:
+                                print(f"\033[31m[ERROR] Invalid expression in assignment: {expr}\033[0m")
+                        else:
+                            print(f"\033[31m[ERROR] Index {index} out of range for list '{var_name}'\033[0m")
+                    else:
+                        print(f"\033[31m[ERROR] '{var_name}' is not a list or doesn't exist.\033[0m")
+                except Exception as e:
+                    print(f"\033[31m[ERROR] Error on line {i+1}: {e} \033[0m")
+                i += 1
+                continue
+
             assign_match = re.match(r'(var|let)\s*(\w+)\s*=\s*(.*)', line)
             if assign_match:
                 _, var_name, expr = assign_match.groups()
@@ -167,6 +190,7 @@ class interpreter:
                     print(f"\033[31m[ERROR] Error on line {i+1}: {e} \033[0m")
                 i += 1
                 continue
+
 
             elif re.match(r'\w+\s*=\s*.*', line):
                 print(f"\033[31m[ERROR] Error on line {i+1}: Variables must be declared using 'let' or 'var'.\033[0m")
