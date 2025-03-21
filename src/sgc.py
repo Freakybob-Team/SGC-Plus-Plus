@@ -56,6 +56,16 @@ class interpreter:
                 i += 1
                 continue
 
+            if line.startswith("import "):
+                module_name = line.split(" ")[1]
+                try:
+                    self.modules[module_name] = importlib.import_module(module_name)
+                except Exception as e:
+                    print(f"\033[31m[ERROR] Failed to import '{module_name}': {e}\033[0m")
+                i += 1
+                continue
+                
+            
             while_match = re.match(r'while \((.*?)\) do', line)
             if while_match:
                 condition = while_match.group(1)
@@ -71,18 +81,11 @@ class interpreter:
 
                 while bool(evaluate_expression(condition, self.variables)):
                     self.execute("\n".join(loop_body))
+                    if 'break' in self.variables:
+                        del self.variables['break']
+                        break
                 continue
-            
-            if line.startswith("import "):
-                module_name = line.split(" ")[1]
-                try:
-                    self.modules[module_name] = importlib.import_module(module_name)
-                except Exception as e:
-                    print(f"\033[31m[ERROR] Failed to import '{module_name}': {e}\033[0m")
-                i += 1
-                continue
-                
-            
+
             for_match = re.match(r'for \((.*?)\) do', line)
             if for_match:
                 loop_parts = for_match.group(1).split(";")
@@ -106,6 +109,14 @@ class interpreter:
                 while bool(evaluate_expression(condition.strip(), self.variables)):
                     self.execute("\n".join(loop_body))
                     self.execute(update.strip())
+                    if 'break' in self.variables:
+                        del self.variables['break']
+                        break
+                continue
+
+            if line.strip() == "break":
+                self.variables['break'] = True
+                i += 1
                 continue
 
             
