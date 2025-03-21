@@ -2,6 +2,13 @@
 SGC++
 
 This module provides a simple interface for interacting with the SGC++ language. It includes methods for executing SGC++ code, if statements, while statements, for statements, handling variables, and removing comments.
+
+------------------------------------------------------------------
+
+THIS IS A BETA VERSION OF SGC++ WHERE IT SUPPORTS FUNCTIONS. 
+
+THE FUNCTIONS ARE BARELY USABLE AND ARE VERY BUGGY.
+
 """
 import sys
 import re
@@ -26,6 +33,7 @@ class interpreter:
             'round': round
         }
         self.modules = {}
+        self.functions = {}
 
     def remove_comments(self, code):
         string_pattern = r'(\".*?\"|\'.*?\')'
@@ -258,6 +266,32 @@ class interpreter:
                             print(f"\033[31m[ERROR] Invalid expression in assignment: {expr}\033[0m")
                     except Exception as e:
                         print(f"\033[31m[ERROR] Error on line {i+1}: {e}\033[0m")
+                i += 1
+                continue
+            
+            function_match = re.match(r'function\s*(\w+)\(\)\s*{', line)
+            if function_match:
+                function_name = function_match.group(1)
+                function_body = []
+                i += 1
+
+                while i < len(lines) and lines[i].strip() != "}":
+                    function_body.append(lines[i].strip())
+                    i += 1
+
+                if i < len(lines) and lines[i].strip() == "}":
+                    i += 1
+
+                self.functions[function_name] = function_body
+                continue
+
+            function_call_match = re.match(r'(\w+)\(\)', line)
+            if function_call_match:
+                function_name = function_call_match.group(1)
+                if function_name in self.functions:
+                    self.execute("\n".join(self.functions[function_name]))
+                else:
+                    print(f"\033[31m[ERROR] Function '{function_name}' not defined.\033[0m")
                 i += 1
                 continue
 
