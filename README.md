@@ -70,7 +70,7 @@ gregPr "ghahahaha you have been hacked hahgahgahah"
 
   **First of all:**
 
-  - SigmaGreg had ass syntax, you could barely do anything and there were so many things that was bad about it. SGC++ will fix all of that.
+  - SigmaGreg had bad syntax, you could barely do anything and there were so many things that was bad about it. SGC++ will fix all of that.
   - Nicer looking keywords (eg: ```gPrintln()```) unlike the original SigmaGreg Code (eg: ```gregPr```)
   - Not as buggy!!!
 
