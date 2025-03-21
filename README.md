@@ -16,7 +16,7 @@ A remake of SigmaGreg.
 - [ ] Move to-do items to individual GitHub issues <!-- grrr -->
 - [x] Python modules **(kinda done)**
 - [x] Lists 
-- [ ] Every fucking thing
+- [ ] Every freaking thing
 
 
 ## Better Syntax
