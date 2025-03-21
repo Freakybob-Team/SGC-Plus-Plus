@@ -130,34 +130,51 @@ class interpreter:
 
             if_match = re.match(r'if \((.*?)\) then', line)
             if if_match:
-                condition = if_match.group(1)
-                try:
-                    condition_result = bool(evaluate_expression(condition, self.variables))
-                    inside_if_block = []
-                    i += 1
+               condition = if_match.group(1)
+               try:
+                  if "isinstance" in condition:
+                     match = re.match(r'isinstance\((.*?),\s*(\w+)\)', condition)
+                     if match:
+                        var_name = match.group(1).strip()
+                        type_name = match.group(2).strip()
+                        if var_name in self.variables:
+                           type_obj = eval(type_name, self.builtins)
+                           condition_result = isinstance(self.variables[var_name], type_obj)
+                        else:
+                           print(f"\033[31m[ERROR] Variable '{var_name}' does not exist.\033[0m")
+                           condition_result = False
+                     else:
+                        condition_result = bool(evaluate_expression(condition, self.variables))
 
-                    while i < len(lines) and not re.match(r'^(else|end)$', lines[i].strip()):
-                        inside_if_block.append(lines[i])
-                        i += 1
+                  else:
+                     condition_result = bool(evaluate_expression(condition, self.variables))
 
-                    else_block = []
-                    if i < len(lines) and lines[i].strip() == "else":
+                  inside_if_block = []
+                  i += 1
+
+                  while i < len(lines) and not re.match(r'^(else|end)$', lines[i].strip()):
+                     inside_if_block.append(lines[i])
+                     i += 1
+
+                  else_block = []
+                  if i < len(lines) and lines[i].strip() == "else":
+                     i += 1
+                     while i < len(lines) and lines[i].strip() != "end":
+                        else_block.append(lines[i])
                         i += 1
-                        while i < len(lines) and lines[i].strip() != "end":
-                            else_block.append(lines[i])
-                            i += 1
-                    
-                    if i < len(lines) and lines[i].strip() == "end":
-                        i += 1
-                    
-                    if condition_result:
-                        self.execute("\n".join(inside_if_block))
-                    elif else_block:
-                        self.execute("\n".join(else_block))
-                    continue
-                except Exception as e:
-                    print(f"\033[31m[ERROR] Error evaluating if condition: {e}\033[0m")
-                    return
+                
+                  if i < len(lines) and lines[i].strip() == "end":
+                     i += 1
+                
+                  if condition_result:
+                     self.execute("\n".join(inside_if_block))
+                  elif else_block:
+                     self.execute("\n".join(else_block))
+                  continue
+               except Exception as e:
+                  print(f"\033[31m[ERROR] Error evaluating if condition: {e}\033[0m")
+                  return
+
             
             
             const_match = re.match(r'const\s*(\w+)\s*=\s*(.*)', line)
