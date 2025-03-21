@@ -13,10 +13,11 @@ end
 // temp unit input
 let unit = gReadln("Choose unit: Celsius [C] or Fahrenheit [F]: ")
 unit = unit.upper()
+
 if (not unit) then
     gPrintln("error: no input for temp, re-run the program and try again.")
     exit(1)
-
+end
 if (unit != "C" and unit != "F") then
     gPrintln("error: not a unit, re-run the program and try again.")
     exit(1)
