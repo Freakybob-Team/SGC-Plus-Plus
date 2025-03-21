@@ -23,21 +23,26 @@ A remake of SigmaGreg.
 **Just look at this!!!**
 
 ```
-// the original variable
-var what = gReadln("is names gay y/n")
-var change_what = what.lower() // change the variable to lowercase
+import random
 
-if (change_what == "y") then
-    var gay = True
-else
-    var gay = False
+// variables
+var abc = "abcdefghijklmnopqrstuvwxyz"
+var digits = "0123456789"
+var special_chars = "!@#$%^&*()_-+=<>?"
+var all_chars = abc + abc.upper() + digits + special_chars
+
+let password = ""
+let length = 12
+let i = 0
+
+// brand new WHILE LOOP!!!!!!
+while (i < length) do
+    password = password + random.choice(all_chars)
+    i = i + 1
 end
 
-if (gay) then
-    gPrintln("geg")
-else
-    gPrintln("ok")
-end
+// Final password
+gPrintln(f"Generated password: {password}")
 ```
 
 **WAY better than SigmaGreg's syntax..**
