@@ -1,6 +1,6 @@
 var greg = "1" // original variable with the string "1"
 let change = int(greg) // changes the string to a int
-var greg = change // greg is now a int
+greg = change // greg is now a int
 
 // if statement stuff
 if (greg) then
