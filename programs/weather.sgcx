@@ -3,7 +3,7 @@ import requests // import requests (python)
 let api_key = '3da8bb24af6562a8a1a9d2c4464b5f8e' // api key greg hahahah exposed
 let city = gReadln("What place?")  // Input for city
 // capitalize the first letter of the city name
-let city = city.capitalize()
+city = city.capitalize()
 
 if (not city) then
     gPrintln("Error: No input, re-run the program and try again.")
@@ -12,7 +12,7 @@ end
 
 // temp unit input
 let unit = gReadln("Choose unit: Celsius [C] or Fahrenheit [F]: ")
-let unit = unit.upper()
+unit = unit.upper()
 if (not unit) then
     gPrintln("error: no input for temp, re-run the program and try again.")
     exit(1)
