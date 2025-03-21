@@ -8,7 +8,7 @@ let correct_answer = num1 * num2
 gPrintln(f"What is {num1} x {num2}?")
 
 let answer = gReadln("Your answer: ")
-let answer = int(answer)
+answer = int(answer)
 
 if (answer == correct_answer) then
     gPrintln("nerd smh")
