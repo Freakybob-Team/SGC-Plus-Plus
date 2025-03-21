@@ -25,6 +25,7 @@ class interpreter:
             'sum': sum,
             'round': round
         }
+        self.modules = {}
 
     def remove_comments(self, code):
         string_pattern = r'(\".*?\"|\'.*?\')'
@@ -71,10 +72,11 @@ class interpreter:
                 while bool(evaluate_expression(condition, self.variables)):
                     self.execute("\n".join(loop_body))
                 continue
+            
             if line.startswith("import "):
                 module_name = line.split(" ")[1]
                 try:
-                    self.variables[module_name] = importlib.import_module(module_name)
+                    self.modules[module_name] = importlib.import_module(module_name)
                 except Exception as e:
                     print(f"\033[31m[ERROR] Failed to import '{module_name}': {e}\033[0m")
                 i += 1
@@ -154,7 +156,7 @@ class interpreter:
                     print(f"\033[31m[ERROR] Cannot redefine existing variable or constant: {var_name}\033[0m")
                 else:
                     try:
-                        result = evaluate_expression(expr, {**self.variables, **self.builtins})
+                        result = evaluate_expression(expr, {**self.variables, **self.builtins, **self.modules})
                         self.variables[var_name] = result
                         self.constants.add(var_name)
                     except Exception as e:
@@ -172,7 +174,7 @@ class interpreter:
                     elif var_name in self.variables and isinstance(self.variables[var_name], list):
                         list_var = self.variables[var_name]
                         if index < len(list_var):
-                            result = evaluate_expression(expr, {**self.variables, **self.builtins})
+                            result = evaluate_expression(expr, {**self.variables, **self.builtins, **self.modules})
                             if result is not None:
                                 list_var[index] = result
                             else:
@@ -202,7 +204,7 @@ class interpreter:
                             prompt = re.match(r'gReadln\((.*?)\)', expr).group(1).strip()
                             self.variables[var_name] = gReadln(prompt, self.variables)
                         else:
-                            result = evaluate_expression(expr, {**self.variables, **self.builtins})
+                            result = evaluate_expression(expr, {**self.variables, **self.builtins, **self.modules})
                             if result is not None:
                                 self.variables[var_name] = result
                             else:
@@ -218,10 +220,10 @@ class interpreter:
                 if var_name in self.constants:
                     print(f"\033[31m[ERROR] Cannot reassign constant '{var_name}'.\033[0m")
                 elif var_name not in self.variables:
-                    print(f"\033[31m[ERROR] Variable '{var_name}' does not exist. Declare it using 'let', 'var' or 'const'.\033[0m")
+                    print(f"\033[31m[ERROR] Variable '{var_name}' does not exist. Declare it first.\033[0m")
                 else:
                     try:
-                        result = evaluate_expression(expr, {**self.variables, **self.builtins})
+                        result = evaluate_expression(expr, {**self.variables, **self.builtins, **self.modules})
                         if result is not None:
                             self.variables[var_name] = result
                         else:
@@ -239,7 +241,7 @@ class interpreter:
 
             elif re.match(r'^\w+\.\w+\(.*\)', line): 
                 try:
-                    evaluate_expression(line, self.variables)
+                    evaluate_expression(line, {**self.variables, **self.modules})
                 except Exception as e:
                     print(f"\033[31m[ERROR] Error on line {i+1}: {e} \033[0m")
                 i += 1
