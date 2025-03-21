@@ -4,7 +4,7 @@ A remake of SigmaGreg.
 
 ## To-Do List:
 
-- [x] Variables **(kinda done)**
+- [x] Variables **fucked up rn**
 - [ ] Functions
 - [x] If statements **(kinda done)**
 - [x] While loops **(new, needs to be fixed)**
