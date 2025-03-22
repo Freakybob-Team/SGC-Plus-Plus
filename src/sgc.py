@@ -124,9 +124,11 @@ class interpreter:
                 match = re.match(r'exit\((\d+)\)', line.strip())
                 if match:
                     exit_code = int(match.group(1))
-                    sys.exit(exit_code)
                 else:
-                    sys.exit(0)
+                    exit_code = 0
+                self.variables['exit_code'] = exit_code  
+                return 
+
 
             if_match = re.match(r'if \((.*?)\) then', line)
             if if_match:
