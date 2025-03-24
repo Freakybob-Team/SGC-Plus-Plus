@@ -8,4 +8,7 @@ if (random_vic == "twitter_hater") then
   message = "twitter hater is peak person ever so swag"
 end
 
+if (random_vic == "hyper") then
+    message = "hyper is not stinky and is peak :3333"
+end
 gPrintln(message)
