@@ -1,0 +1,11 @@
+import random
+
+const victims = ["names", "lux", "wish", "squirrel", "hyper", "noma", "twitter_hater", "mpax", "km", "gianca"]
+const random_vic = random.choice(victims)
+var message = f"{random_vic} is stink"
+
+if (random_vic == "twitter_hater") then
+  message = "twitter hater is peak person ever so swag"
+end
+
+gPrintln(message)
