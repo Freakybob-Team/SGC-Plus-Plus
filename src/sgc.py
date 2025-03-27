@@ -26,6 +26,7 @@ class interpreter:
             'round': round
         }
         self.modules = {}
+        self.module_aliases = {}
 
     def remove_comments(self, code):
         string_pattern = r'(\".*?\"|\'.*?\')'
@@ -44,7 +45,69 @@ class interpreter:
             code = code.replace(placeholder, original, 1)
 
         return code
+    def _parse_import_statement(self, line):
+        import_match = re.match(r'import\s+(\w+)(\s+as\s+(\w+))?', line)
+        from_import_match = re.match(r'from\s+(\w+)\s+import\s+([*\w]+)(\s+as\s+(\w+))?', line)
 
+        if import_match:
+            module_name = import_match.group(1)
+            alias = import_match.group(3) or module_name
+            
+            try:
+                module = importlib.import_module(module_name)
+                self.modules[alias] = module
+                self.module_aliases[alias] = module_name
+                return True
+            except Exception as e:
+                print(f"\033[31m[ERROR] Failed to import '{module_name}': {e}\033[0m")
+                return False
+
+        elif from_import_match:
+            module_name = from_import_match.group(1)
+            import_items = from_import_match.group(2)
+            alias = from_import_match.group(4)
+
+            try:
+                module = importlib.import_module(module_name)
+                
+                if import_items == '*':
+                    for name in dir(module):
+                        if not name.startswith('_'):
+                            if alias:
+                                self.variables[f"{alias}.{name}"] = getattr(module, name)
+                            else:
+                                self.variables[name] = getattr(module, name)
+                else:
+                    items = [item.strip() for item in import_items.split(',')]
+                    for item in items:
+                        item_alias_match = re.match(r'(\w+)\s+as\s+(\w+)', item)
+                        if item_alias_match:
+                            original_name = item_alias_match.group(1)
+                            local_alias = item_alias_match.group(2)
+                            
+                            if hasattr(module, original_name):
+                                if alias:
+                                    self.variables[f"{alias}.{local_alias}"] = getattr(module, original_name)
+                                else:
+                                    self.variables[local_alias] = getattr(module, original_name)
+                        else:
+                            if hasattr(module, item):
+                                if alias:
+                                    self.variables[f"{alias}.{item}"] = getattr(module, item)
+                                else:
+                                    self.variables[item] = getattr(module, item)
+                
+                if alias:
+                    self.modules[alias] = module
+                    self.module_aliases[alias] = module_name
+
+                return True
+            except Exception as e:
+                print(f"\033[31m[ERROR] Failed to import from '{module_name}': {e}\033[0m")
+                return False
+
+        return False
+        
     def execute(self, code):
         code = self.remove_comments(code)
         lines = code.split('\n')
@@ -56,14 +119,10 @@ class interpreter:
                 i += 1
                 continue
 
-            if line.startswith("import "):
-                module_name = line.split(" ")[1]
-                try:
-                    self.modules[module_name] = importlib.import_module(module_name)
-                except Exception as e:
-                    print(f"\033[31m[ERROR] Failed to import '{module_name}': {e}\033[0m")
-                i += 1
-                continue
+            if line.startswith("import ") or line.startswith("from "):
+                if self._parse_import_statement(line):
+                    i += 1
+                    continue
                 
             
             while_match = re.match(r'while \((.*?)\) do', line)
