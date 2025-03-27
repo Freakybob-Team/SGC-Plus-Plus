@@ -95,5 +95,5 @@ gregPr "ghahahaha you have been hacked hahgahgahah"
 
 
 <p align=center>
-    <small>Some things might change. Feel free to help with this, devs!</small>
+    <small>THIS IS VERY NEW. EXPECT BUGS.</small>
 </p>
