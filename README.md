@@ -9,8 +9,8 @@ A remake of SigmaGreg.
 - [x] If statements **(kinda done)**
 - [x] While loops **(new, needs to be fixed)**
 - [x] For loops   **(new, needs to be fixed)**
-- [x] Input
-- [x] Output
+- [x] Input (broken)
+- [x] Output (ass)
 - [x] Comments
 - [x] Error handling **(kinda done)**
 - [ ] Move to-do items to individual GitHub issues <!-- grrr -->
