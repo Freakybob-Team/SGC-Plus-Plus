@@ -45,6 +45,7 @@ class interpreter:
             code = code.replace(placeholder, original, 1)
 
         return code
+        
     def _parse_import_statement(self, line):
         import_match = re.match(r'import\s+(\w+)(\s+as\s+(\w+))?', line)
         from_import_match = re.match(r'from\s+(\w+)\s+import\s+([*\w]+)(\s+as\s+(\w+))?', line)
@@ -277,27 +278,29 @@ class interpreter:
                 i += 1
                 continue
 
-            assign_match = re.match(r'(var|let)\s*(\w+)\s*=\s*(.*)', line)
+            assign_match = re.match(r'(var|let|const)\s*(\w+)\s*=\s*(.*)', line)
             if assign_match:
                 _, var_name, expr = assign_match.groups()
-                if var_name in self.variables:
-                    print(f"\033[31m[ERROR] Variable '{var_name}' already exists. Use simple assignment without 'var', 'let' or 'const'.\033[0m")
+                if var_name in self.variables and _ == 'const':
+                    print(f"\033[31m[ERROR] Cannot redefine constant: {var_name}\033[0m")
                 else:
                     try:
-                        if expr.startswith("["):
-                            self.variables[var_name] = eval(expr)
+                        expr = expr.strip()
+                        if expr.lower() == 'null':
+                            result = None
+                        elif expr.startswith("["):
+                            result = eval(expr)
                         elif expr.startswith("gPrintln"):
                             content = re.match(r'gPrintln\((.*?)\)', expr).group(1).strip()
-                            self.variables[var_name] = gPrintln(content, self.variables)
+                            result = gPrintln(content, self.variables)
                         elif expr.startswith("gReadln"):
                             prompt = re.match(r'gReadln\((.*?)\)', expr).group(1).strip()
-                            self.variables[var_name] = gReadln(prompt, self.variables)
+                            result = gReadln(prompt, self.variables)
                         else:
                             result = evaluate_expression(expr, {**self.variables, **self.builtins, **self.modules})
-                            if result is not None:
-                                self.variables[var_name] = result
-                            else:
-                                raise ValueError(f"\033[31m[ERROR] Invalid expression in assignment: {expr}\033[0m")
+                        self.variables[var_name] = result
+                        if _ == 'const':
+                            self.constants.add(var_name)
                     except Exception as e:
                         print(f"\033[31m[ERROR] Error on line {i+1}: {e}\033[0m")
                 i += 1
@@ -312,11 +315,12 @@ class interpreter:
                     print(f"\033[31m[ERROR] Variable '{var_name}' does not exist. Declare it first.\033[0m")
                 else:
                     try:
-                        result = evaluate_expression(expr, {**self.variables, **self.builtins, **self.modules})
-                        if result is not None:
-                            self.variables[var_name] = result
+                        expr = expr.strip()
+                        if expr.lower() == 'null':
+                            result = None
                         else:
-                            print(f"\033[31m[ERROR] Invalid expression in assignment: {expr}\033[0m")
+                            result = evaluate_expression(expr, {**self.variables, **self.builtins, **self.modules})
+                        self.variables[var_name] = result
                     except Exception as e:
                         print(f"\033[31m[ERROR] Error on line {i+1}: {e}\033[0m")
                 i += 1
