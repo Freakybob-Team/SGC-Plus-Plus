@@ -17,9 +17,8 @@ if __name__ == "__main__":
 
         print("-" * 50)
         input(f"Exited with code: {color}{exit_code}{reset}. Press enter to exit...")
+        exit(exit_code)
     else:
         print("\033[33m[WARNING] No file provided. Use: python main.py filename.sgcx\033[0m")
         print("\n" + "-" * 50)
         input("Press enter to exit...")
-
-
