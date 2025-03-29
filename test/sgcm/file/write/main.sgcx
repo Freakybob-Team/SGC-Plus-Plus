@@ -1,0 +1,12 @@
+import sgcm as sm  // import the sgcm module !!
+import os
+
+const filename = "test.txt" // filename
+sm.write(filename, "w", "TEST???") // make the file
+var exist = sm.fileExists(filename) // check if it exists and worked
+
+// yea
+if (exist):
+    gPrintln("File has been made!!!")
+else:
+    gPrintln("oh ok")
