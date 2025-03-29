@@ -4,11 +4,11 @@ const victims = ["names", "lux", "wish", "squirrel", "hyper", "noma", "twitter_h
 const random_vic = random.choice(victims)
 var message = f"{random_vic} is stink"
 
-if (random_vic == "twitter_hater") then
+if (random_vic == "twitter_hater"):
   message = "twitter hater is peak person ever so swag"
-end
 
-if (random_vic == "hyper") then
+
+if (random_vic == "hyper"):
     message = "hyper is not stinky and is peak :3333"
-end
+
 gPrintln(message)
