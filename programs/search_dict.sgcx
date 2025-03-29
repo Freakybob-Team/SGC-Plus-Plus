@@ -4,9 +4,9 @@ var emoji = {":sob:": "😭", ":smile:": "😃", ":heart:": "❤️", ":broken_h
 var search = gReadln("search")
 var search_lower = search.lower()
 
-if (search_lower in emoji) then
+if (search_lower in emoji):
     gPrintln(f"Found \"{search_lower}\"!\n------------------------------")
     gPrintln(emoji[search])
-else
+else:
     gPrintln(f"couldn't find \"{search_lower}\"")
-end
+
