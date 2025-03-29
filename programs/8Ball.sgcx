@@ -12,15 +12,13 @@ time.sleep(1)
 var question = gReadln("Ask a question [or type 'exit' to quit]: ").strip()
 
 // if statements for question
-if (not question) then
+if (not question):
     gPrintln("grrrr")
     exit(1)
-end
 
-if (question.lower() == "exit") then
+if (question.lower() == "exit"):
     gPrintln("Bai bai!")
     exit()
-end
 // end if statements
 
 // main
