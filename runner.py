@@ -21,7 +21,6 @@ except ImportError:
     print("inquirer not installed.. installing it now..")
     os.system("pip install inquirer")
     import inquirer
-
 class Colors:
     HEADER = '\033[95m'
     BLUE = '\033[94m'
@@ -117,8 +116,9 @@ def execute_script(main_py_path, sgcx_path):
         subprocess.run(["python", main_py_path, sgcx_path], check=True)
         print("\n" + "─" * get_terminal_size().columns)
     except subprocess.CalledProcessError as e:
-        print("\n" + "─" * get_terminal_size().columns)
-        print(f"{Colors.FAIL}error executing {sgcx_path}: {e}{Colors.ENDC}")
+        if e.returncode != 1:
+            print("\n" + "─" * get_terminal_size().columns)
+            print(f"{Colors.FAIL}error executing {sgcx_path}: {e}{Colors.ENDC}")
     except FileNotFoundError as e:
         print(f"{Colors.FAIL}not found but uhh here: {e}{Colors.ENDC}")
     input(f"\n{Colors.BOLD}Press Enter to continue...{Colors.ENDC}")
