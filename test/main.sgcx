@@ -79,10 +79,10 @@ time.sleep(1)
 var name_input = gReadln("What is ya name :3")
 name_input = str(name_input)
 name_input = name_input.lower()
-if (name_input == "greg") then
+if (name_input == "greg"):
     gPrintln("wow greg i'm a big fan")
-else
+else:
     gPrintln(f"haii {name_input}!!!!!")
-end
+
 gPrintln("=" * 50)
 time.sleep(1)
