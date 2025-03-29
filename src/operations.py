@@ -54,19 +54,18 @@ def gPrintln(text, variables):
         return None
 
 
-def gReadln(prompt, variables):
-    try:
-        if prompt not in variables:
-            print(f"\033[31m[ERROR] Error: Variable '{prompt}' does not exist\033[0m")
-            return None
-    
+def gReadln(prompt, variables=None):
+    if prompt not in variables:
+        prompt_value = prompt.strip('"').strip("'")
+    else:
         prompt_value = variables[prompt]
-    
-        user_input = input(f"{prompt_value} ")
 
+    try:
+        user_input = input(f"{prompt_value} ")
         return user_input
     except Exception as e:
         print(f"\033[31m[ERROR] Error: {e}\033[0m")
         return None
     except KeyboardInterrupt:
         print("\033[31m[ERROR] Error: input was interrupted\033[0m")
+        return None
