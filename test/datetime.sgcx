@@ -18,13 +18,12 @@ var day = now.day
 var hour = now.hour
 var minute = now.minute
 
-if (hour > 12) then
+if (hour > 12):
     var hour_12 = hour - 12
     var am_pm = "PM"
-else
+else:
     var hour_12 = hour
     var am_pm = "AM"
-end
 
 var result = f"Current date and time: {month}/{day}/{year} {hour_12}:{minute} {am_pm}"
 gPrintln(result)
