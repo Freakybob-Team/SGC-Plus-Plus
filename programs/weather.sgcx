@@ -8,7 +8,66 @@ city = city.capitalize()
 if (not city) then
     gPrintln("Error: No input, re-run the program and try again.")
     exit(1)
-end
+endimport requests // import requests (python)
+
+let api_key = '3da8bb24af6562a8a1a9d2c4464b5f8e' // api key greg hahahah exposed
+let city = gReadln("What place?")  // Input for city
+// capitalize the first letter of the city name
+city = city.capitalize()
+
+if (not city):
+    gPrintln("Error: No input, re-run the program and try again.")
+    exit(1)
+
+
+// temp unit input
+let unit = gReadln("Choose unit: Celsius [C] or Fahrenheit [F]: ")
+unit = unit.upper()
+
+if (not unit):
+    gPrintln("error: no input for temp, re-run the program and try again.")
+    exit(1)
+
+if (unit != "C" and unit != "F"):
+    gPrintln("error: not a unit, re-run the program and try again.")
+    exit(1)
+
+
+// unit if statement yk
+if (unit == "F"):
+    let unit_param = "imperial"
+else:
+    let unit_param = "metric"
+
+
+// weather api url rgeg
+let url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units={unit_param}"
+
+// the stuff for the requests
+let response = requests.get(url)
+let json = response.json()
+
+if (response.status_code == 200):
+    gPrintln("=" * 40)
+    gPrintln(f"{city}'s weather right now is:")
+
+    // get weather data
+    let weather = json['weather'][0]['description']
+    let weather_cap = weather.capitalize()
+    let temperature = json['main']['temp']
+    let humidity = json['main']['humidity']
+    let wind_speed = json['wind']['speed']
+
+    // print weather details
+    gPrintln(f"Condition: {weather_cap}")
+    gPrintln(f"Temperature: {temperature} °{unit}")
+    gPrintln(f"Humidity: {humidity}%")
+    gPrintln(f"Wind Speed: {wind_speed} m/s")
+    gPrintln("=" * 40)
+else:
+    gPrintln("error: unable to get weather data, try again by re-running the program.")
+    exit(1)
+
 
 // temp unit input
 let unit = gReadln("Choose unit: Celsius [C] or Fahrenheit [F]: ")
