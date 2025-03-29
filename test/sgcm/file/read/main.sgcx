@@ -1,0 +1,4 @@
+import sgcm as sm
+var read = sm.read("test.txt")
+
+gPrintln(read)
