@@ -1,0 +1,17 @@
+// print system variable gregs
+gPrintln(__VERSION__)
+gPrintln(__AUTHOR__)
+gPrintln(__LICENSE__)
+
+// test errors
+var __VERSION__ = "rheg"
+var __LICENSE__ = "3"
+var __AUTHOR__ = "rgeg
+
+__VERSION__ = "rheg"
+__LICENSE__ = "3"
+__AUTHOR__ = "rgeg
+
+const __VERSION__ = "rheg"
+const __LICENSE__ = "3"
+const __AUTHOR__ = "rgeg
