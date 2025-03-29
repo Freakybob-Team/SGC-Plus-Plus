@@ -10,8 +10,8 @@ gPrintln(f"What is {num1} x {num2}?")
 let answer = gReadln("Your answer: ")
 answer = int(answer)
 
-if (answer == correct_answer) then
+if (answer == correct_answer):
     gPrintln("nerd smh")
-else
+else:
     gPrintln(f"hahaha dummy it was {correct_answer}")
-end
+
