@@ -1,53 +1,49 @@
 var num1 = gReadln("Enter num for num1 plz:")
 num1 = int(num1)
 
-if (isinstance(num1, int)) then
+if (isinstance(num1, int)):
     gPrintln(f"num1 = {num1}")
-else
+else::
     gPrintln("DUCK YOU YOU DUCKING GREG")
     exit(69)
-end
-if (not num1) then
+
+if (not num1):
     gPrintln("grr")
     exit(69)
-end
 
 var num2 = gReadln("enter value for num2:")
 num2 = int(num2)
-if (isinstance(num2, int)) then
+if (isinstance(num2, int)):
     gPrintln(f"num2 = {num2}")
-else
+else::
     gPrintln("GGGGGGG")
     exit(69)
-end
 
-if (not num2) then
+if (not num2):
     gPrintln("grr")
     exit(69)
-end
 
 var operation = gReadln("what operation? [*, /, -. +]")
 operation = str(operation)
 
-if (isinstance(operation, int)) then
+if (isinstance(operation, int)):
     gPrintln("ok vro")
     exit(69)
-end
 
-if (not operation) then
+
+if (not operation):
     gPrintln("gggggrrrrr")
     exit(69)
-end
 
-if (operation == "+") then
+if (operation == "+"):
     gPrintln(num1 + num2)
-end
-if (operation == "-") then
+
+if (operation == "-"):
     gPrintln(num1 - num2)
-end
-if (operation == "/") then
+
+if (operation == "/"):
     gPrintln(num1 / num2)
-end
-if (operation == "*") then
+
+if (operation == "*"):
     gPrintln(num1 * num2)
-end
+
