@@ -22,10 +22,17 @@ class interpreter:
             'min': min,
             'max': max,
             'sum': sum,
-            'round': round
+            'round': round,
         }
         self.modules = {}
         self.module_aliases = {}
+        self.system_variables = {"__VERSION__": 1.5, "__AUTHOR__": "Freakybob-Team", "__LICENSE__": "MIT"}
+        self.variables.update(self.builtins)
+        for var in self.system_variables:
+            self.variables[var] = self.system_variables[var]
+            self.constants.add(var)
+        
+
 
     def remove_comments(self, code):
         string_pattern = r'(\".*?\"|\'.*?\')'
@@ -300,7 +307,9 @@ class interpreter:
             const_match = re.match(r'const\s*(\w+)\s*=\s*(.*)', line)
             if const_match:
                 var_name, expr = const_match.groups()
-                if var_name in self.variables:
+                if var_name in self.system_variables:
+                    print(f"\033[31m[ERROR] '{var_name}' is a variable that cannot be changed due to being a system variable.\033[0m")
+                elif var_name in self.variables:
                     print(f"\033[31m[ERROR] Cannot redefine existing variable or constant: {var_name}\033[0m")
                 else:
                     try:
@@ -315,6 +324,10 @@ class interpreter:
             assign_match = re.match(r'(var|let)\s*(\w+)\[(\d+)\]\s*=\s*(.*)', line)
             if assign_match:
                 _, var_name, index, expr = assign_match.groups()
+                if var_name in self.system_variables:
+                    print(f"\033[31m[ERROR] '{var_name}' is a variable that cannot be changed due to being a system variable.\033[0m")
+                    i += 1
+                    continue
                 try:
                     index = int(index)
                     if var_name in self.constants:
@@ -339,6 +352,10 @@ class interpreter:
             assign_match = re.match(r'(var|let|const)\s*(\w+)\s*=\s*(.*)', line)
             if assign_match:
                 _, var_name, expr = assign_match.groups()
+                if var_name in self.system_variables:
+                    print(f"\033[31m[ERROR] '{var_name}' is a reserved system variable and cannot be reassigned.\033[0m")
+                    i += 1
+                    continue
                 if var_name in self.variables and _ == 'const':
                     print(f"\033[31m[ERROR] Cannot redefine constant: {var_name}\033[0m")
                 else:
@@ -367,6 +384,8 @@ class interpreter:
             reassign_match = re.match(r'(\w+)\s*=\s*(.*)', line)
             if reassign_match:
                 var_name, expr = reassign_match.groups()
+                if var_name in self.system_variables:
+                    print(f"\033[31m[ERROR] '{var_name}' is a variable that cannot be changed due to being a system variable.\033[0m")
                 if var_name in self.constants:
                     print(f"\033[31m[ERROR] Cannot reassign constant '{var_name}'.\033[0m")
                 elif var_name not in self.variables:
