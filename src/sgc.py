@@ -7,6 +7,7 @@ import re
 from operations import gPrintln, gReadln
 from utils import evaluate_expression
 import importlib
+import sys
 
 class interpreter:
     def __init__(self):
@@ -222,15 +223,19 @@ class interpreter:
                 i += 1
                 continue
 
-            
             if line.startswith("exit("):
                 match = re.match(r'exit\((\d+)\)', line.strip())
                 if match:
                     exit_code = int(match.group(1))
                 else:
                     exit_code = 0
-                self.variables['exit_code'] = exit_code  
-                return 
+                self.variables['exit_code'] = exit_code
+                color = "\033[32m" if exit_code == 0 else "\033[31m"
+                reset = "\033[0m"
+                print("-" * 50)
+                input(f"Exited with code: {color}{exit_code}{reset}. Press enter to exit...")
+                sys.exit(exit_code)
+                
 
 
             if_match = re.match(r'if\s+\((.*?)\):', line)
