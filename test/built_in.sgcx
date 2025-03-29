@@ -3,8 +3,7 @@ let change = int(greg) // changes the string to a int
 greg = change // greg is now a int
 
 // if statement stuff
-if (isinstance(greg, int)) then
+if (isinstance(greg, int)):
     gPrintln(f"variable \"greg\" is now a int!")
-else 
+else:
     gPrintln("ok vro")
-end
