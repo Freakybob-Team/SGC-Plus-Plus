@@ -353,7 +353,7 @@ class interpreter:
             if assign_match:
                 _, var_name, expr = assign_match.groups()
                 if var_name in self.system_variables:
-                    print(f"\033[31m[ERROR] '{var_name}' is a reserved system variable and cannot be reassigned.\033[0m")
+                    print(f"\033[31m[ERROR] '{var_name}' is a variable that cannot be changed due to being a system variable.\033[0m")
                     i += 1
                     continue
                 if var_name in self.variables and _ == 'const':
