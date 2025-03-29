@@ -39,26 +39,29 @@ def find_file(message, filter_func):
         else:
             print("no exist...")
     return selected_path
-def save_config(main_py_path):
-    config_dir = "SGC++"
+def get_config_path():
+    home_dir = os.path.expanduser("~")
+    config_dir = os.path.join(home_dir, "SGC++")  
     os.makedirs(config_dir, exist_ok=True)
-    config_path = os.path.join(config_dir, "config.json")
-    config = {"main_py_path": main_py_path}
+    return os.path.join(config_dir, "config.json")
+def save_config(main_py_path):
+    config_path = get_config_path()
+    config = {"main_py_path": os.path.abspath(main_py_path)}
     try:
         with open(config_path, "w") as f:
             json.dump(config, f, indent=4)
         print(f"main.py path saved to {config_path}!")
     except IOError as e:
-        print(f"error saving configuration: {e}")
+        print(f"Error saving configuration: {e}")
 def load_config():
-    config_path = os.path.join("SGC++", "config.json")
+    config_path = get_config_path()
     if os.path.exists(config_path):
         try:
             with open(config_path, "r") as f:
                 config = json.load(f)
             return config.get("main_py_path")
         except (IOError, json.JSONDecodeError) as e:
-            print(f"error loading configuration: {e}")
+            print(f"Error loading configuration: {e}")
     return None
 def execute_script(main_py_path, sgcx_path):
     try:
