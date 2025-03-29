@@ -107,7 +107,43 @@ class interpreter:
                 return False
 
         return False
+    
+    
+    def _get_indentation_level(self, line):
+        return len(line) - len(line.lstrip())
+    
+    def _get_indented_block(self, lines, start_index, base_indent):
+        block = []
+        i = start_index
         
+        if i >= len(lines) or self._get_indentation_level(lines[i]) <= base_indent:
+            return block, i
+            
+        expected_indent = self._get_indentation_level(lines[i])
+        
+        if expected_indent <= base_indent:
+            print(f"\033[31m[ERROR] Indentation error on line {i+1}: Expected increased indentation level\033[0m")
+            return block, i
+        
+        while i < len(lines):
+            line = lines[i]
+            if not line.strip():
+                i += 1
+                continue
+                
+            indent = self._get_indentation_level(line)
+            
+            if indent > base_indent and indent != expected_indent:
+                print(f"\033[31m[ERROR] Inconsistent indentation on line {i+1}\033[0m")
+            
+            if indent <= base_indent: 
+                break
+                
+            block.append(line)
+            i += 1
+            
+        return block, i
+    
     def execute(self, code):
         code = self.remove_comments(code)
         lines = code.split('\n')
@@ -115,6 +151,7 @@ class interpreter:
 
         while i < len(lines):
             line = lines[i].strip()
+            curr_indent = self._get_indentation_level(lines[i])
             if not line:
                 i += 1
                 continue
@@ -189,52 +226,74 @@ class interpreter:
                 return 
 
 
-            if_match = re.match(r'if \((.*?)\) then', line)
+            if_match = re.match(r'if\s+\((.*?)\):', line)
             if if_match:
-               condition = if_match.group(1)
-               try:
-                  if "isinstance" in condition:
-                     match = re.match(r'isinstance\((.*?),\s*(\w+)\)', condition)
-                     if match:
-                        var_name = match.group(1).strip()
-                        type_name = match.group(2).strip()
-                        if var_name in self.variables:
-                           type_obj = eval(type_name, self.builtins)
-                           condition_result = isinstance(self.variables[var_name], type_obj)
+                condition = if_match.group(1)
+                try:
+                    if "isinstance" in condition:
+                        match = re.match(r'isinstance\((.*?),\s*(\w+)\)', condition)
+                        if match:
+                            var_name = match.group(1).strip()
+                            type_name = match.group(2).strip()
+                            if var_name in self.variables:
+                                type_obj = eval(type_name, self.builtins)
+                                condition_result = isinstance(self.variables[var_name], type_obj)
+                            else:
+                                print(f"\033[31m[ERROR] Variable '{var_name}' does not exist.\033[0m")
+                                condition_result = False
                         else:
-                           print(f"\033[31m[ERROR] Variable '{var_name}' does not exist.\033[0m")
-                           condition_result = False
-                     else:
+                            condition_result = bool(evaluate_expression(condition, self.variables))
+                    else:
                         condition_result = bool(evaluate_expression(condition, self.variables))
 
-                  else:
-                     condition_result = bool(evaluate_expression(condition, self.variables))
-
-                  inside_if_block = []
-                  i += 1
-
-                  while i < len(lines) and not re.match(r'^(else|end)$', lines[i].strip()):
-                     inside_if_block.append(lines[i])
-                     i += 1
-
-                  else_block = []
-                  if i < len(lines) and lines[i].strip() == "else":
-                     i += 1
-                     while i < len(lines) and lines[i].strip() != "end":
-                        else_block.append(lines[i])
-                        i += 1
+                    if_block, next_idx = self._get_indented_block(lines, i+1, curr_indent)
                 
-                  if i < len(lines) and lines[i].strip() == "end":
-                     i += 1
+                    block_executed = False
+                    new_i = next_idx
                 
-                  if condition_result:
-                     self.execute("\n".join(inside_if_block))
-                  elif else_block:
-                     self.execute("\n".join(else_block))
-                  continue
-               except Exception as e:
-                  print(f"\033[31m[ERROR] Error evaluating if condition: {e}\033[0m")
-                  return
+                    if condition_result:
+                        self.execute("\n".join(if_block))
+                        block_executed = True
+                
+                    while new_i < len(lines):
+                        next_line = lines[new_i].strip()
+                        elif_match = re.match(r'elif\s+\((.*?)\):', next_line)
+                        if not elif_match:
+                            break
+                        
+                        if not block_executed:
+                            elif_condition = elif_match.group(1)
+                            elif_condition_result = bool(evaluate_expression(elif_condition, self.variables))
+                        
+                            elif_block, next_idx = self._get_indented_block(lines, new_i+1, curr_indent)
+                            new_i = next_idx
+                        
+                            if elif_condition_result:
+                                self.execute("\n".join(elif_block))
+                                block_executed = True
+                        else:
+                            _, next_idx = self._get_indented_block(lines, new_i+1, curr_indent)
+                            new_i = next_idx
+                
+                    if new_i < len(lines) and lines[new_i].strip() == "else:":
+                        if not block_executed:
+                            else_block, next_idx = self._get_indented_block(lines, new_i+1, curr_indent)
+                            self.execute("\n".join(else_block))
+                        else:
+                            _, next_idx = self._get_indented_block(lines, new_i+1, curr_indent)
+                        new_i = next_idx
+                    
+                    i = new_i
+                    continue
+                except Exception as e:
+                    print(f"\033[31m[ERROR] Error evaluating if condition on line {i+1}: {e}\033[0m")
+                    i += 1
+                    continue
+        
+            if line.startswith("elif") or line == "else:":
+                print(f"\033[31m[ERROR] '{line}' without preceding 'if' statement on line {i+1}\033[0m")
+                i += 1
+                continue
 
             
             
