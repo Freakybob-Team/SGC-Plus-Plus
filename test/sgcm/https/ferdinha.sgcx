@@ -1,0 +1,3 @@
+import sgcm
+
+sgcm.ferdinhaUpload("assets/1.png")
