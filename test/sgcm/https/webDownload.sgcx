@@ -1,0 +1,3 @@
+import sgcm
+
+sgcm.webDownload("https://github.com/5quirre1.png", "assets/2.png")
