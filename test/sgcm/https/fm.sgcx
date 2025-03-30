@@ -1,0 +1,3 @@
+import sgcm
+
+sgcm.lastFM("API_KEY", "Username")
