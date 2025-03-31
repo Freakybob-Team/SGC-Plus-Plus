@@ -15,7 +15,7 @@ var num2 = gReadln("enter value for num2:")
 num2 = int(num2)
 if (isinstance(num2, int)):
     gPrintln(f"num2 = {num2}")
-else::
+else:
     gPrintln("GGGGGGG")
     exit(69)
 
