@@ -89,7 +89,7 @@ gregPr "ghahahaha you have been hacked hahgahgahah"
   2024-2025 Freakybob-Team. Everything is licensed under MIT.
 </p>
 <p align="center">
-<img src="src/sgc_file/logo.ico" width="40" height="40" alt="Sg_logo.png"/>
+<img src="src/assets/logo.ico" width="40" height="40" alt="Sg_logo.png"/>
 
 </p>
 
