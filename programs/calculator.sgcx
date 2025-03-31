@@ -3,7 +3,7 @@ num1 = int(num1)
 
 if (isinstance(num1, int)):
     gPrintln(f"num1 = {num1}")
-else::
+else:
     gPrintln("DUCK YOU YOU DUCKING GREG")
     exit(69)
 
