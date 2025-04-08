@@ -1,0 +1,17 @@
+/*
+
+SGC++ elif statement
+
+4/7/25 8:04 PM 
+
+*/
+
+const x = 3
+const y = 3
+
+if (x > y):
+    gPrintln("x is bigger than y")
+elif (y > x):
+    gPrintln("y is bigger than x")
+else:
+    gPrintln("equal")
