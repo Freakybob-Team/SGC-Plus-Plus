@@ -1,4 +1,4 @@
-"""
+\"""
 SGC++
 
 This module provides a simple interface for interacting with the SGC++ language. It includes methods for executing SGC++ code, if statements, while statements, for statements, handling variables, and removing comments.
@@ -7,6 +7,7 @@ import re
 from operations import gPrintln, gReadln
 from utils import evaluate_expression
 import importlib
+import os
 import sys
 
 class interpreter:
@@ -62,7 +63,11 @@ class interpreter:
             alias = import_match.group(3) or module_name
             
             try:
-                module = importlib.import_module(module_name)
+                
+                module = self._import_local_module(module_name)
+                if module is None:  
+                    module = importlib.import_module(module_name)
+                
                 self.modules[alias] = module
                 self.module_aliases[alias] = module_name
                 return True
@@ -76,7 +81,10 @@ class interpreter:
             alias = from_import_match.group(4)
 
             try:
-                module = importlib.import_module(module_name)
+                
+                module = self._import_local_module(module_name)
+                if module is None:  
+                    module = importlib.import_module(module_name)
                 
                 if import_items == '*':
                     for name in dir(module):
@@ -115,6 +123,32 @@ class interpreter:
                 return False
 
         return False
+    
+    def _import_local_module(self, module_name):       
+        possible_paths = [
+            f"{module_name}.py",
+            f"./{module_name}.py",
+            f"{module_name}/__init__.py"
+        ]
+        
+        for path in possible_paths:
+            if os.path.exists(path):
+                try:
+                    abs_path = os.path.abspath(path)
+                    module_name_to_use = module_name
+                    spec = importlib.util.spec_from_file_location(module_name_to_use, abs_path)
+                    if spec is None:
+                        continue
+            
+                    module = importlib.util.module_from_spec(spec)
+                    sys.modules[module_name_to_use] = module
+                    spec.loader.exec_module(module)
+                    return module
+                except Exception as e:
+                    print(f"\033[33m[WARNING] Failed to import local file '{path}': {e}\033[0m")
+        
+        return None
+
     
     
     def _get_indentation_level(self, line):
