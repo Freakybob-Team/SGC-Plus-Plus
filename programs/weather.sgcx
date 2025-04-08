@@ -1,7 +1,7 @@
 import requests // import requests (python)
 
 let api_key = '3da8bb24af6562a8a1a9d2c4464b5f8e' // api key greg hahahah exposed
-let city = gReadln("What place?")  // Input for city
+let city = gReadln("What place? ")  // Input for city
 // capitalize the first letter of the city name
 city = city.capitalize()
 
