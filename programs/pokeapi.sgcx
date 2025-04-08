@@ -1,0 +1,15 @@
+import requests
+import sgcm as sm
+
+const url = "https://pokeapi.co/api/v2/pokemon/?limit=25"
+const response = requests.get(url)
+let data = response.json()
+const prettyPrint = sm.prettyPrint(data)
+data = prettyPrint
+
+if (response.status_code == 200):
+    gPrintln(data)
+else:
+    gPrintln("o")
+
+// just smth random
