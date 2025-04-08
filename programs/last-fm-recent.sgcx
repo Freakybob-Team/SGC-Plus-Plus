@@ -1,13 +1,13 @@
 import requests
 
-let username = gReadln("What is the username:") // ask the user for the last.fm username (eg: 5quirre1Z)
+let username = gReadln("What is the username: ") // ask the user for the last.fm username (eg: Squirre1Z)
 
 // no username
 if (not username):
     gPrintln("no username.. try again")
     exit(1)
 
-let API_KEY = gReadln("put the last.fm api key here plz!") // ask for the api key (won't work without one)
+let API_KEY = gReadln("put the last.fm api key here plz! ") // ask for the api key (won't work without one)
 
 // no api key
 if (not API_KEY):
@@ -36,4 +36,3 @@ if ('recenttracks' in json):
     gPrintln("=" * 40)
 else:
     gPrintln("didn't find any recent data..")
-
