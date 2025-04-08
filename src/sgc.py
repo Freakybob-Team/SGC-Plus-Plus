@@ -26,9 +26,20 @@ class interpreter:
             'sum': sum,
             'round': round,
         }
+        self.type_mappings = {
+            'String': str,
+            'Int': int,
+            'Float': float,
+            'Boolean': bool,
+            'List': list,
+            'Dict': dict,
+            'Tuple': tuple,
+            'Set': set,
+        }
+
         self.modules = {}
         self.module_aliases = {}
-        self.system_variables = {"__VERSION__": 1.5, "__AUTHOR__": "Freakybob-Team", "__LICENSE__": "MIT"}
+        self.system_variables = {"__VERSION__": 1.6, "__AUTHOR__": "Freakybob-Team", "__LICENSE__": "MIT"}
         self.variables.update(self.builtins)
         for var in self.system_variables:
             self.variables[var] = self.system_variables[var]
@@ -145,7 +156,7 @@ class interpreter:
                     spec.loader.exec_module(module)
                     return module
                 except Exception as e:
-                    print(f"\033[33m[WARNING] Failed to import local file '{path}': {e}\033[0m")
+                    print(f"\033[31m[ERROR] Failed to import local file '{path}': {e}\033[0m")
         
         return None
 
@@ -186,6 +197,16 @@ class interpreter:
             
         return block, i
     
+    def _type_check(self, value, expected_type_name):
+        expected_type = self.type_mappings.get(expected_type_name)
+        if expected_type is None:
+            print(f"\033[31m[ERROR] Unknown type: {expected_type_name}\033[0m")
+            return False
+            
+        if value is None:
+            return expected_type_name == "None"
+            
+        return isinstance(value, expected_type)
     def execute(self, code):
         code = self.remove_comments(code)
         lines = code.split('\n')
@@ -341,7 +362,95 @@ class interpreter:
                 i += 1
                 continue
 
-            
+            compound_assign_match = re.match(r'(\w+)\s*(\+=|\-=|\*=|\/=|%=|\*\*=|\/\/=|&=|\|=|\^=|<<=|>>=)\s*(.*)', line)
+            if compound_assign_match:
+                var_name, operator, expr = compound_assign_match.groups()
+                if var_name in self.system_variables:
+                    print(f"\033[31m[ERROR] '{var_name}' is a variable that cannot be changed due to being a system variable.\033[0m")
+                    i += 1
+                    continue
+                if var_name in self.constants:
+                    print(f"\033[31m[ERROR] Cannot modify constant '{var_name}'.\033[0m")
+                    i += 1
+                    continue
+                if var_name not in self.variables:
+                    print(f"\033[31m[ERROR] Variable '{var_name}' does not exist. Declare it first.\033[0m")
+                    i += 1
+                    continue
+                
+                try:
+                    current_value = self.variables[var_name]
+                    result = evaluate_expression(expr, {**self.variables, **self.builtins, **self.modules})
+                
+                    if operator == '+=':
+                        self.variables[var_name] = current_value + result
+                    elif operator == '-=':
+                        self.variables[var_name] = current_value - result
+                    elif operator == '*=':
+                        self.variables[var_name] = current_value * result
+                    elif operator == '/=':
+                        self.variables[var_name] = current_value / result
+                    elif operator == '%=':
+                        self.variables[var_name] = current_value % result
+                    elif operator == '**=':
+                        self.variables[var_name] = current_value ** result
+                    elif operator == '//=':
+                        self.variables[var_name] = current_value // result
+                    elif operator == '&=':
+                        self.variables[var_name] = current_value & result
+                    elif operator == '|=':
+                        self.variables[var_name] = current_value | result
+                    elif operator == '^=':
+                        self.variables[var_name] = current_value ^ result
+                    elif operator == '<<=':
+                        self.variables[var_name] = current_value << result
+                    elif operator == '>>=':
+                        self.variables[var_name] = current_value >> result
+                except Exception as e:
+                    print(f"\033[31m[ERROR] Error on line {i+1}: {e}\033[0m")
+                i += 1
+                continue
+
+
+            typed_variable = re.match(r'(var|let|const)\s*(\w+):\s*(\w+)\s*=\s*(.*)', line)
+            if typed_variable:
+                decl_type, var_name, type_name, expr = typed_variable.groups()
+                if var_name in self.system_variables:
+                    print(f"\033[31m[ERROR] '{var_name}' is a variable that cannot be changed due to being a system variable.\033[0m")
+                    i += 1
+                    continue
+                if var_name in self.variables and decl_type == 'const':
+                    print(f"\033[31m[ERROR] Cannot redefine constant: {var_name}\033[0m")
+                    i += 1
+                    continue
+                
+                try:
+                    expr = expr.strip()
+                    if expr.lower() == 'null':
+                        result = None
+                    elif expr.startswith("["):
+                        result = eval(expr)
+                    elif expr.startswith("gPrintln"):
+                        content = re.match(r'gPrintln\((.*?)\)', expr).group(1).strip()
+                        result = gPrintln(content, self.variables)
+                    elif expr.startswith("gReadln"):
+                        prompt = re.match(r'gReadln\((.*?)\)', expr).group(1).strip()
+                        result = gReadln(prompt, self.variables)
+                    else:
+                        result = evaluate_expression(expr, {**self.variables, **self.builtins, **self.modules})
+                    
+                    if not self._type_check(result, type_name):
+                        print(f"\033[31m[ERROR] Type error on line {i+1}: Expected {type_name} but got {type(result).__name__} for variable '{var_name}'\033[0m")
+                        i += 1
+                        continue
+                        
+                    self.variables[var_name] = result
+                    if decl_type == 'const':
+                        self.constants.add(var_name)
+                except Exception as e:
+                    print(f"\033[31m[ERROR] Error on line {i+1}: {e}\033[0m")
+                i += 1
+                continue
             
             const_match = re.match(r'const\s*(\w+)\s*=\s*(.*)', line)
             if const_match:
@@ -472,7 +581,7 @@ class interpreter:
                 print(f"\033[31m[ERROR] Syntax Error on line {i+1}: Unrecognized statement: {line} \033[0m")
                 i += 1
                 continue
-
+                
 
     def run_file(self, filename):
         if filename.endswith(".sgcx"):
