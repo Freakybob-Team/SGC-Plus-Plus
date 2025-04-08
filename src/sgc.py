@@ -1,4 +1,4 @@
-\"""
+"""
 SGC++
 
 This module provides a simple interface for interacting with the SGC++ language. It includes methods for executing SGC++ code, if statements, while statements, for statements, handling variables, and removing comments.
