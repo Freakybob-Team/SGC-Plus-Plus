@@ -5,7 +5,7 @@ A remake of SigmaGreg.
 ## To-Do List:
 
 - [x] Variables
-- [ ] Functions
+- [x] Functions **(new, expect bugs)**
 - [x] If statements
 - [x] Types 
 - [x] While loops **(new, needs to be fixed)**
