@@ -264,6 +264,7 @@ class interpreter:
         
             return content
         return f_string
+    
     def execute(self, code):
         code = self.remove_comments(code)
         lines = code.split('\n')
@@ -660,6 +661,32 @@ class interpreter:
                         expr = expr.strip()
                         if expr.lower() == 'null':
                             result = None
+                        elif expr.startswith("["):
+                            result = eval(expr)
+                        elif expr.startswith("gPrintln"):
+                            content = re.match(r'gPrintln\((.*?)\)', expr).group(1).strip()
+                            result = gPrintln(content, self.variables)
+                        elif expr.startswith("gReadln"):
+                            prompt = re.match(r'gReadln\((.*?)\)', expr).group(1).strip()
+                            result = gReadln(prompt, self.variables)
+                        elif re.match(r'(\w+)\((.*?)\)', expr) and re.match(r'(\w+)\((.*?)\)', expr).group(1) in self.functions:
+                            func_match = re.match(r'(\w+)\((.*?)\)', expr)
+                            func_name = func_match.group(1)
+                            args_str = func_match.group(2).strip()
+
+                            args = []
+                            if args_str:
+                                for arg in re.findall(r'(?:[^,"]|"(?:\\.|[^"])*")++', args_str):
+                                    arg = arg.strip()
+                                if arg:  
+                                    try:
+                                        value = evaluate_expression(arg, self.variables)
+                                        args.append(value)
+                                    except Exception as e:
+                                        print(f"\033[31m[ERROR] Error evaluating argument '{arg}': {e}\033[0m")
+                                        break
+    
+                            result = self._call_function(func_name, args)
                         else:
                             result = evaluate_expression(expr, {**self.variables, **self.builtins, **self.modules})
                         self.variables[var_name] = result
