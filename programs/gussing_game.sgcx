@@ -1,0 +1,60 @@
+/*
+this code kinda sucks but you have to get creative with sgc++ lmfao
+
+SGC++ Number Guessing game
+------------------------------------
+4/9/25 10:58 AM - Made by the one and only Squirrel Acorns
+
+*/
+
+import random
+import time
+import os
+
+func clear_screen():
+    time.sleep(1)
+    if (os.name == 'nt'):
+        os.system('cls')
+    else:
+        os.system('clear')
+
+func is_number(s):
+    for (char in s):
+        if (char < '0' or char > '9'):
+            return False
+    return True
+
+func makeSureGuessIsGood(guess):
+    var ok = is_number(guess)
+    if not ok:
+        return None
+    return int(guess)
+
+
+func game():
+    var random_num = random.randint(1,30)
+    while (True):
+        gPrintln("I'm thinking of a number between 1 and 30.. try to guess it hahahah \p1type \"exit\" to exit\p2")
+        var guess = gReadln(">>> ")
+        if (guess == "exit"):
+            gPrintln("BAII BAI!!!")
+            exit()
+        else:
+            guess = makeSureGuessIsGood(guess)
+            
+            if (guess == None):
+                gPrintln("not a number vro")
+                exit(1)
+
+            if (guess > 30):
+                gPrintln("1-30 dumbass")
+            elif (guess > random_num):
+                gPrintln("oops lmfao too high")
+            elif (guess < random_num):
+                gPrintln("too low greg")
+            else:
+                gPrintln(f"Good job!! it was {random_num}!!!")
+                exit()
+        clear_screen()
+            
+game()
