@@ -1,0 +1,15 @@
+import time // time module
+
+
+gPrintln("ok\nok") // testing \n
+gPrintln("\tgreg") // testing \t
+
+// testing \r
+for (var i = 0; i < 5;i += 1) do
+    time.sleep(0.7)
+    gPrintln("\rwow")
+end
+
+gPrintln("\"gay\"") // testing \"
+gPrintln("\'g\'") // testing \'
+gPrintln("gggg \p1ok\p2") // testing \p1 and \p2 (it's just "()")
