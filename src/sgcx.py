@@ -1,7 +1,7 @@
 """
 SGC++
 
-This module provides a simple interface for interacting with the SGC++ language. It includes methods for executing SGC++ code, if statements, while statements, for statements, handling variables, functions, and removing comments.
+This module provides a simple interface for interacting with the SGC++ language. It includes methods for executing SGC++ code, if statements, while statements, for statements, handling variables, functions, function calls, and removing comments.
 """
 import re
 from operations import gPrintln, gReadln
