@@ -6,15 +6,16 @@ A remake of SigmaGreg.
 
 - [x] Variables
 - [ ] Functions
-- [x] If statements **(kinda done)**
+- [x] If statements
+- [x] Types 
 - [x] While loops **(new, needs to be fixed)**
 - [x] For loops   **(new, needs to be fixed)**
-- [x] Input (broken)
-- [x] Output (ass)
+- [x] Input
+- [x] Output **(ass)**
 - [x] Comments
-- [x] Error handling **(kinda done)**
+- [x] Error handling
 - [ ] Move to-do items to individual GitHub issues <!-- grrr -->
-- [x] Python modules **(kinda done)**
+- [x] Python modules
 - [x] Lists 
 - [ ] Every freaking thing
 
