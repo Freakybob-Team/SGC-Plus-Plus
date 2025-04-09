@@ -1,7 +1,7 @@
 """
 SGC++
 
-This module provides a simple interface for interacting with the SGC++ language. It includes methods for executing SGC++ code, if statements, while statements, for statements, handling variables, and removing comments.
+This module provides a simple interface for interacting with the SGC++ language. It includes methods for executing SGC++ code, if statements, while statements, for statements, handling variables, functions, and removing comments.
 """
 import re
 from operations import gPrintln, gReadln
@@ -14,6 +14,7 @@ class interpreter:
     def __init__(self):
         self.variables = {}
         self.constants = set()
+        self.functions = {}
         self.builtins = {
             'str': str,
             'int': int,
@@ -207,6 +208,62 @@ class interpreter:
             return expected_type_name == "None"
             
         return isinstance(value, expected_type)
+
+    def _call_function(self, func_name, args):
+        if func_name not in self.functions:
+            print(f"\033[31m[ERROR] Function '{func_name}' is not defined\033[0m")
+            return None
+            
+        func_info = self.functions[func_name]
+        func_body = func_info['body']
+        param_names = func_info['params']
+        
+        if len(args) != len(param_names):
+            print(f"\033[31m[ERROR] Function '{func_name}' expects {len(param_names)} arguments, but got {len(args)}\033[0m")
+            return None
+            
+        
+        old_vars = self.variables.copy()
+        
+        
+        for i, param in enumerate(param_names):
+            self.variables[param] = args[i]
+            
+        
+        result = None
+        try:
+            self.execute("\n".join(func_body))
+            
+            if 'return_value' in self.variables:
+                result = self.variables['return_value']
+                del self.variables['return_value']
+        except Exception as e:
+            print(f"\033[31m[ERROR] Error in function '{func_name}': {e}\033[0m")
+            
+        
+        self.variables = old_vars
+        
+        return result
+    
+    def _process_f_string(self, f_string):
+        if f_string.startswith('f"') or f_string.startswith("f'"):
+        
+            if f_string.startswith('f"'):
+                content = f_string[2:-1]  
+            else:
+                content = f_string[2:-1]  
+        
+        
+            for var_match in re.finditer(r'\{([^{}]+)\}', content):
+                var_expr = var_match.group(1)
+                try:
+                    value = evaluate_expression(var_expr, self.variables)
+                    content = content.replace(f"{{{var_expr}}}", str(value))
+                except Exception as e:
+                    print(f"\033[31m[ERROR] Error evaluating variable '{var_expr}' in f-string: {e}\033[0m")
+        
+            return content
+        return f_string
     def execute(self, code):
         code = self.remove_comments(code)
         lines = code.split('\n')
@@ -245,34 +302,76 @@ class interpreter:
                         break
                 continue
 
-            for_match = re.match(r'for \((.*?)\) do', line)
+            for_match = re.match(r'for\s+(.*?)(?:\s+do|:)', line)
             if for_match:
-                loop_parts = for_match.group(1).split(";")
-                if len(loop_parts) != 3:
-                    print(f"\033[31m[ERROR] Invalid for loop syntax on line {i+1}\033[0m")
-                    return
-
-                init, condition, update = loop_parts
-                self.execute(init.strip())
-
-                loop_body = []
-                i += 1
-
-                while i < len(lines) and lines[i].strip() != "end":
-                    loop_body.append(lines[i])
-                    i += 1
-
-                if i < len(lines) and lines[i].strip() == "end":
-                    i += 1
-
-                while bool(evaluate_expression(condition.strip(), self.variables)):
-                    self.execute("\n".join(loop_body))
-                    self.execute(update.strip())
-                    if 'break' in self.variables:
-                        del self.variables['break']
-                        break
+                for_expr = for_match.group(1).strip()
+                loop_body, next_idx = self._get_indented_block(lines, i+1, curr_indent)
+                
+                
+                
+                
+                classic_match = re.match(r'\((.*?);(.*?);(.*?)\)', for_expr)
+                if classic_match:
+                    init, condition, update = classic_match.groups()
+                    self.execute(init.strip())
+                    
+                    while bool(evaluate_expression(condition.strip(), self.variables)):
+                        self.execute("\n".join(loop_body))
+                        if 'break' in self.variables:
+                            del self.variables['break']
+                            break
+                        self.execute(update.strip())
+                
+                in_match = re.match(r'(\w+)\s+in\s+(.*)', for_expr)
+                if in_match:
+                    var_name, collection_expr = in_match.groups()
+                    try:
+                        collection = evaluate_expression(collection_expr, self.variables)
+                        
+                        if isinstance(collection, (list, tuple, str, dict, set)):
+                            for item in collection:
+                                self.variables[var_name] = item
+                                self.execute("\n".join(loop_body))
+                                if 'break' in self.variables:
+                                    del self.variables['break']
+                                    break
+                        else:
+                            print(f"\033[31m[ERROR] Cannot iterate over {type(collection).__name__}\033[0m")
+                    except Exception as e:
+                        print(f"\033[31m[ERROR] Error in for-in loop: {e}\033[0m")
+                
+                range_match = re.match(r'(\w+)\s+in\s+range\((.*?)\)', for_expr)
+                if range_match:
+                    var_name, range_args = range_match.groups()
+                    try:
+                        args = [arg.strip() for arg in range_args.split(',')]
+                        range_values = []
+                        
+                        if len(args) == 1:
+                            end = int(evaluate_expression(args[0], self.variables))
+                            range_values = range(end)
+                        elif len(args) == 2:
+                            start = int(evaluate_expression(args[0], self.variables))
+                            end = int(evaluate_expression(args[1], self.variables))
+                            range_values = range(start, end)
+                        elif len(args) == 3:
+                            start = int(evaluate_expression(args[0], self.variables))
+                            end = int(evaluate_expression(args[1], self.variables))
+                            step = int(evaluate_expression(args[2], self.variables))
+                            range_values = range(start, end, step)
+                        
+                        for val in range_values:
+                            self.variables[var_name] = val
+                            self.execute("\n".join(loop_body))
+                            if 'break' in self.variables:
+                                del self.variables['break']
+                                break
+                    except Exception as e:
+                        print(f"\033[31m[ERROR] Error in range-based loop: {e}\033[0m")
+                
+                i = next_idx
                 continue
-
+            
             if line.strip() == "break":
                 self.variables['break'] = True
                 i += 1
@@ -519,6 +618,24 @@ class interpreter:
                         elif expr.startswith("gReadln"):
                             prompt = re.match(r'gReadln\((.*?)\)', expr).group(1).strip()
                             result = gReadln(prompt, self.variables)
+                        elif re.match(r'(\w+)\((.*?)\)', expr) and re.match(r'(\w+)\((.*?)\)', expr).group(1) in self.functions:
+                            func_match = re.match(r'(\w+)\((.*?)\)', expr)
+                            func_name = func_match.group(1)
+                            args_str = func_match.group(2).strip()
+
+                            args = []
+                            if args_str:
+                                for arg in re.findall(r'(?:[^,"]|"(?:\\.|[^"])*")++', args_str):
+                                    arg = arg.strip()
+                                if arg:  
+                                    try:
+                                        value = evaluate_expression(arg, self.variables)
+                                        args.append(value)
+                                    except Exception as e:
+                                        print(f"\033[31m[ERROR] Error evaluating argument '{arg}': {e}\033[0m")
+                                        break
+    
+                            result = self._call_function(func_name, args)
                         else:
                             result = evaluate_expression(expr, {**self.variables, **self.builtins, **self.modules})
                         self.variables[var_name] = result
@@ -550,6 +667,82 @@ class interpreter:
                         print(f"\033[31m[ERROR] Error on line {i+1}: {e}\033[0m")
                 i += 1
                 continue
+            
+            func_match = re.match(r'func\s+(\w+)\((.*?)\):', line)
+            if func_match:
+                func_name = func_match.group(1)
+                params_str = func_match.group(2).strip()
+                params = [p.strip() for p in params_str.split(',')] if params_str else []
+                
+                
+                func_body, next_idx = self._get_indented_block(lines, i+1, curr_indent)
+                
+                if not func_body:
+                    print(f"\033[31m[ERROR] Empty function body for '{func_name}' on line {i+1}\033[0m")
+                    i += 1
+                    continue
+                    
+                
+                self.functions[func_name] = {
+                    'params': params,
+                    'body': func_body
+                }
+                
+                i = next_idx
+                continue
+                
+            
+            func_call_match = re.match(r'(\w+)\((.*?)\)', line)
+            if func_call_match and func_call_match.group(1) in self.functions:
+                func_name = func_call_match.group(1)
+                args_str = func_call_match.group(2).strip()
+                
+                if args_str:
+                    args = []
+                    
+                    for arg in re.findall(r'(?:[^,"]|"(?:\\.|[^"])*")++', args_str):
+                        arg = arg.strip()
+                        if arg:  
+                            try:
+                                value = evaluate_expression(arg, self.variables)
+                                args.append(value)
+                            except Exception as e:
+                                print(f"\033[31m[ERROR] Error evaluating argument '{arg}': {e}\033[0m")
+                                break
+                else:
+                    args = []
+                    
+                self._call_function(func_name, args)
+                i += 1
+                continue
+                
+            
+            
+            if line.startswith("return "):
+                return_expr = line[7:].strip()
+                try:
+                    if return_expr:
+                        if return_expr.startswith('f"') or return_expr.startswith("f'"):
+                            return_value = self._process_f_string(return_expr)
+                            self.variables['return_value'] = return_value
+                        elif return_expr.startswith("gPrintln"):
+                            content = re.match(r'gPrintln\((.*?)\)', return_expr).group(1).strip()
+                            return_value = gPrintln(content, self.variables)
+                            self.variables['return_value'] = return_value
+                        elif return_expr.startswith("gReadln"):
+                            prompt = re.match(r'gReadln\((.*?)\)', return_expr).group(1).strip()
+                            return_value = gReadln(prompt, self.variables)
+                            self.variables['return_value'] = return_value
+                        else:
+                            return_value = evaluate_expression(return_expr, self.variables)
+                            self.variables['return_value'] = return_value
+                    else:
+                        self.variables['return_value'] = None
+                except Exception as e:
+                    print(f"\033[31m[ERROR] Error in return statement: {e}\033[0m")
+                i += 1
+                continue
+
 
 
             elif re.match(r'\w+\s*=\s*.*', line):
