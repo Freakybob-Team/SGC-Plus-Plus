@@ -1,0 +1,6 @@
+func wow(name):
+    return f"Haiiii {name}!111"
+
+var ok = wow("greg")
+
+gPrintln(ok)
