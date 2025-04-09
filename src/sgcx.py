@@ -170,9 +170,14 @@ class interpreter:
         block = []
         i = start_index
         
-        if i >= len(lines) or self._get_indentation_level(lines[i]) <= base_indent:
-            return block, i
+        
+        while i < len(lines) and not lines[i].strip():
+            i += 1
             
+        if i >= len(lines):
+            return block, i
+        
+        
         expected_indent = self._get_indentation_level(lines[i])
         
         if expected_indent <= base_indent:
@@ -181,20 +186,28 @@ class interpreter:
         
         while i < len(lines):
             line = lines[i]
+            
+            
             if not line.strip():
+                block.append(line)
                 i += 1
                 continue
                 
             indent = self._get_indentation_level(line)
             
-            if indent > base_indent and indent != expected_indent:
-                print(f"\033[31m[ERROR] Inconsistent indentation on line {i+1}\033[0m")
             
-            if indent <= base_indent: 
+            if indent <= base_indent:
                 break
                 
-            block.append(line)
-            i += 1
+            
+            
+            if indent >= expected_indent:
+                block.append(line)
+                i += 1
+            else:
+                
+                print(f"\033[31m[ERROR] Inconsistent indentation on line {i+1}: Expected at least {expected_indent} spaces but got {indent}\033[0m")
+                i += 1
             
         return block, i
     
@@ -283,33 +296,35 @@ class interpreter:
                     continue
                 
             
-            while_match = re.match(r'while \((.*?)\) do', line)
+            while_match = re.match(r'while\s+(.*?):', line)
             if while_match:
                 condition = while_match.group(1)
-                loop_body = []
-                i += 1
-
-                while i < len(lines) and lines[i].strip() != "end":
-                    loop_body.append(lines[i])
-                    i += 1
-
-                if i < len(lines) and lines[i].strip() == "end":
-                    i += 1
-
+                loop_body, next_idx = self._get_indented_block(lines, i+1, curr_indent)
+                
+                if not loop_body:
+                    print(f"\033[31m[ERROR] Empty while loop body on line {i+1}\033[0m")
+                    i = next_idx
+                    continue
+                    
                 while bool(evaluate_expression(condition, self.variables)):
+                    self.variables.pop('continue', None)  
                     self.execute("\n".join(loop_body))
+                    
                     if 'break' in self.variables:
                         del self.variables['break']
                         break
+                    
+                    if 'continue' in self.variables:
+                        del self.variables['continue']
+                        
+                i = next_idx
                 continue
 
-            for_match = re.match(r'for\s+(.*?)(?:\s+do|:)', line)
+
+            for_match = re.match(r'for\s+(.*?):', line)
             if for_match:
                 for_expr = for_match.group(1).strip()
                 loop_body, next_idx = self._get_indented_block(lines, i+1, curr_indent)
-                
-                
-                
                 
                 classic_match = re.match(r'\((.*?);(.*?);(.*?)\)', for_expr)
                 if classic_match:
@@ -317,10 +332,17 @@ class interpreter:
                     self.execute(init.strip())
                     
                     while bool(evaluate_expression(condition.strip(), self.variables)):
+                        self.variables.pop('continue', None)  
                         self.execute("\n".join(loop_body))
+                        
                         if 'break' in self.variables:
                             del self.variables['break']
                             break
+                            
+                        if 'continue' in self.variables:
+                            del self.variables['continue']
+                            
+                            
                         self.execute(update.strip())
                 
                 in_match = re.match(r'(\w+)\s+in\s+(.*)', for_expr)
@@ -331,11 +353,17 @@ class interpreter:
                         
                         if isinstance(collection, (list, tuple, str, dict, set)):
                             for item in collection:
+                                self.variables.pop('continue', None)  
                                 self.variables[var_name] = item
                                 self.execute("\n".join(loop_body))
+                                
                                 if 'break' in self.variables:
                                     del self.variables['break']
                                     break
+                                    
+                                if 'continue' in self.variables:
+                                    del self.variables['continue']
+                                    continue  
                         else:
                             print(f"\033[31m[ERROR] Cannot iterate over {type(collection).__name__}\033[0m")
                     except Exception as e:
@@ -362,11 +390,17 @@ class interpreter:
                             range_values = range(start, end, step)
                         
                         for val in range_values:
+                            self.variables.pop('continue', None)  
                             self.variables[var_name] = val
                             self.execute("\n".join(loop_body))
+                            
                             if 'break' in self.variables:
                                 del self.variables['break']
                                 break
+                                
+                            if 'continue' in self.variables:
+                                del self.variables['continue']
+                                continue  
                     except Exception as e:
                         print(f"\033[31m[ERROR] Error in range-based loop: {e}\033[0m")
                 
@@ -377,6 +411,12 @@ class interpreter:
                 self.variables['break'] = True
                 i += 1
                 continue
+                
+            if line.strip() == "continue":
+                self.variables['continue'] = True
+                i += 1
+                continue
+
 
             if line.startswith("exit("):
                 match = re.match(r'exit\((\d+)\)', line.strip())
@@ -393,7 +433,7 @@ class interpreter:
                 
 
 
-            if_match = re.match(r'if\s+\((.*?)\):', line)
+            if_match = re.match(r'if\s+(.*?):', line)
             if if_match:
                 condition = if_match.group(1)
                 try:
@@ -424,7 +464,7 @@ class interpreter:
                 
                     while new_i < len(lines):
                         next_line = lines[new_i].strip()
-                        elif_match = re.match(r'elif\s+\((.*?)\):', next_line)
+                        elif_match = re.match(r'elif\s+(.*?):', next_line)
                         if not elif_match:
                             break
                         
@@ -701,7 +741,6 @@ class interpreter:
                 params_str = func_match.group(2).strip()
                 params = [p.strip() for p in params_str.split(',')] if params_str else []
                 
-                
                 func_body, next_idx = self._get_indented_block(lines, i+1, curr_indent)
                 
                 if not func_body:
@@ -709,7 +748,6 @@ class interpreter:
                     i += 1
                     continue
                     
-                
                 self.functions[func_name] = {
                     'params': params,
                     'body': func_body
@@ -745,30 +783,27 @@ class interpreter:
                 
             
             
-            if line.startswith("return "):
-                return_expr = line[7:].strip()
+            if line.startswith("return"):
+                return_expr = line[6:].strip()  
                 try:
-                    if return_expr:
+                    if return_expr:  
                         if return_expr.startswith('f"') or return_expr.startswith("f'"):
                             return_value = self._process_f_string(return_expr)
-                            self.variables['return_value'] = return_value
                         elif return_expr.startswith("gPrintln"):
                             content = re.match(r'gPrintln\((.*?)\)', return_expr).group(1).strip()
                             return_value = gPrintln(content, self.variables)
-                            self.variables['return_value'] = return_value
                         elif return_expr.startswith("gReadln"):
                             prompt = re.match(r'gReadln\((.*?)\)', return_expr).group(1).strip()
                             return_value = gReadln(prompt, self.variables)
-                            self.variables['return_value'] = return_value
                         else:
                             return_value = evaluate_expression(return_expr, self.variables)
-                            self.variables['return_value'] = return_value
-                    else:
+                        self.variables['return_value'] = return_value
+                    else:  
                         self.variables['return_value'] = None
                 except Exception as e:
                     print(f"\033[31m[ERROR] Error in return statement: {e}\033[0m")
-                i += 1
-                continue
+                break  
+
 
 
 
