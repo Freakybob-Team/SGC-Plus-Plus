@@ -68,7 +68,9 @@ def gPrintln(text, variables):
                 '\\r': '\r', 
                 '\\"': '"', 
                 "\\'": "'",
-                '\\\\': '\\'
+                '\\\\': '\\',
+                '\\p1': '(',
+                '\\p2': ')',
             }
             
             for escape_seq, replacement in escape_sequences.items():
@@ -101,7 +103,9 @@ def gReadln(prompt, variables):
                 '\\r': '\r', 
                 '\\"': '"', 
                 "\\'": "'",
-                '\\\\': '\\'
+                '\\\\': '\\',
+                '\\p1': '(',
+                '\\p2': ')',
             }
             
             for escape_seq, replacement in escape_sequences.items():
