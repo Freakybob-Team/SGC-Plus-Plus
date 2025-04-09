@@ -86,7 +86,7 @@ def gPrintln(text, variables):
 
 def gReadln(prompt, variables):
     try:
-        prompt_value = ""
+        prompt_value = None
 
         if prompt in variables:
             prompt_value = str(variables[prompt])
