@@ -7,19 +7,19 @@ var ok = ")"
 engine.setProperty('rate', 150)
 engine.setProperty('volume', 1)
 
-engine.say("greg hello this was made in the SGC++ coding language")
-engine.runAndWait()
+func speak(wow):
+    engine.say(wow)
+    engine.runAndWait()
 
-while (True) do
+speak("greg hello this was made in the SGC++ coding language")
+
+while (True):
     var input = gReadln(f"input smth {wow}or type end to exit{ok}: ")
     if (not input):
         exit(1)
     elif (input == "end"):
         gPrintln("hope u liked!!")
-        engine.say("bye bye greg")
-        engine.runAndWait()
+        speak("bye bye greg")
         exit()
     gPrintln(input)
-    engine.say(input)
-    engine.runAndWait()
-end
+    speak(input)
