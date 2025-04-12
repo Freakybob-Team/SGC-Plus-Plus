@@ -1,0 +1,22 @@
+import requests
+import sgcm
+import webbrowser
+
+var url = "https://dog.ceo/api/breeds/image/random"
+var request = requests.get(url)
+
+if (request.status_code == 200):
+    var json = request.json()
+    var pretty = sgcm.prettyPrint(json)
+    gPrintln(pretty)
+    if ("message" in json):
+        var w = gReadln("do you want to open image in browser? \p1y or n\p2: ")
+        if (w.lower() == "y"):
+            var image = json["message"]
+            webbrowser.open(image)
+        elif (w.lower() == "n"):
+            gPrintln("ok...")
+        else:
+            gPrintln("what")
+else:
+    gPrintln("error")
