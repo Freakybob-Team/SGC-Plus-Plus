@@ -9,6 +9,8 @@ from utils import evaluate_expression
 import importlib
 import os
 import sys
+import copy
+import math
 
 class interpreter:
     def __init__(self):
@@ -26,7 +28,35 @@ class interpreter:
             'max': max,
             'sum': sum,
             'round': round,
+            'get': dict.get,
+            'copy': copy.copy,
+            'type': type,
+            'list': list,
+            'tuple': tuple,
+            'set': set,
+            'dict': dict,
+            'print': print,
+            'input': input,
+            'range': range,
+            'enumerate': enumerate,
+            'zip': zip,
+            'map': map,
+            'filter': filter,
+            'sorted': sorted,
+            'chr': chr,
+            'ord': ord,
+            'bin': bin,
+            'hex': hex,
+            'oct': oct,
+            'pow': pow,
+            'divmod': divmod,
+            'all': all,
+            'any': any,
         }
+        for name in dir(math):
+            if not name.startswith("__"):
+                self.builtins[name] = getattr(math, name)
+                
         self.type_mappings = {
             'String': str,
             'Int': int,
@@ -45,7 +75,25 @@ class interpreter:
         for var in self.system_variables:
             self.variables[var] = self.system_variables[var]
             self.constants.add(var)
-        
+
+        self.type_mappings = {
+            'String': str,
+            'Int': int,
+            'Float': float,
+            'Boolean': bool,
+            'List': list,
+            'Dict': dict,
+            'Tuple': tuple,
+            'Set': set,
+        }
+
+        self.modules = {}
+        self.module_aliases = {}
+        self.system_variables = {"__VERSION__": 1.6, "__AUTHOR__": "Freakybob-Team", "__LICENSE__": "MIT"}
+        self.variables.update(self.builtins)
+        for var in self.system_variables:
+            self.variables[var] = self.system_variables[var]
+            self.constants.add(var)
 
 
     def remove_comments(self, code):
