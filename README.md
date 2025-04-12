@@ -24,26 +24,31 @@ A remake of SigmaGreg.
 **Just look at this!!!**
 
 ```
-import random
+import pyttsx3
+var engine = pyttsx3.init()
 
-// variables
-var abc = "abcdefghijklmnopqrstuvwxyz"
-var digits = "0123456789"
-var special_chars = "!@#$%^&*()_-+=<>?"
-var all_chars = abc + abc.upper() + digits + special_chars
+var wow = "("
+var ok = ")"
 
-let password = ""
-let length = 12
-let i = 0
+engine.setProperty('rate', 150)
+engine.setProperty('volume', 1)
 
-// brand new WHILE LOOP!!!!!!
-while (i < length) do
-    password = password + random.choice(all_chars)
-    i = i + 1
-end
+func speak(wow):
+    engine.say(wow)
+    engine.runAndWait()
 
-// Final password
-gPrintln(f"Generated password: {password}")
+speak("greg hello this was made in the SGC++ coding language")
+
+while (True):
+    var input = gReadln(f"input smth {wow}or type end to exit{ok}: ")
+    if (not input):
+        exit(1)
+    elif (input == "end"):
+        gPrintln("hope u liked!!")
+        speak("bye bye greg")
+        exit()
+    gPrintln(input)
+    speak(input)
 ```
 
 **WAY better than SigmaGreg's syntax..**
