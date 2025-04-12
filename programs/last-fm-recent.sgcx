@@ -28,11 +28,25 @@ if (response.status_code != 200):
 // get the recent track
 if ('recenttracks' in json):
     gPrintln("=" * 40)
-    gPrintln(f"{username}'s recent track was:\n")
+    
     var track = json['recenttracks']['track'][0]
+    
+    // check if the track is currently playing
+    var now_playing = False
+    if ('@attr' in track and 'nowplaying' in track['@attr'] and track['@attr']['nowplaying'] == 'true'):
+        now_playing = True
+        gPrintln(f"{username} is currently listening to:\n")
+    else:
+        gPrintln(f"{username}'s recent track was:\n")
+    
     gPrintln(f"Track: {track['name']}")
     gPrintln(f"Artist: {track['artist']['#text']}")
     gPrintln(f"Album: {track['album']['#text']}")
+    
+    // display timestamp if not currently playing
+    if (not now_playing and 'date' in track):
+        gPrintln(f"Time: {track['date']['#text']}")
+    
     gPrintln("=" * 40)
 else:
     gPrintln("didn't find any recent data..")
