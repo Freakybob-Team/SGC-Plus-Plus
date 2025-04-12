@@ -1,0 +1,11 @@
+import tkinter as tk
+
+let root = tk.Tk()
+root.title("SGC++ Tkinter Test")
+
+root.geometry("854x480")
+
+let label = tk.Label(root, text="Hello SGC++!", font=("Arial", 20))
+label.pack(pady=20)
+
+root.mainloop()
