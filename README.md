@@ -7,7 +7,7 @@ A remake of SigmaGreg.
 - [x] Variables
 - [x] Functions **(new, expect bugs)**
 - [x] If statements
-- [x] Types 
+- [x] Typing for variables **(new, expect bugs)**
 - [x] While loops **(new, needs to be fixed)**
 - [x] For loops   **(new, needs to be fixed)**
 - [x] Input
@@ -16,7 +16,6 @@ A remake of SigmaGreg.
 - [x] Error handling
 - [ ] Move to-do items to individual GitHub issues <!-- grrr -->
 - [x] Python modules
-- [x] Lists 
 - [ ] Every freaking thing
 
 
