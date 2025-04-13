@@ -23,31 +23,28 @@ A remake of SigmaGreg.
 **Just look at this!!!**
 
 ```
-import pyttsx3
-var engine = pyttsx3.init()
+import requests
+import sgcm
+import webbrowser
 
-var wow = "("
-var ok = ")"
+var url = "https://dog.ceo/api/breeds/image/random"
+var request = requests.get(url)
 
-engine.setProperty('rate', 150)
-engine.setProperty('volume', 1)
-
-func speak(wow):
-    engine.say(wow)
-    engine.runAndWait()
-
-speak("greg hello this was made in the SGC++ coding language")
-
-while (True):
-    var input = gReadln(f"input smth {wow}or type end to exit{ok}: ")
-    if (not input):
-        exit(1)
-    elif (input == "end"):
-        gPrintln("hope u liked!!")
-        speak("bye bye greg")
-        exit()
-    gPrintln(input)
-    speak(input)
+if (request.status_code == 200):
+    var json = request.json()
+    var pretty = sgcm.prettyPrint(json)
+    gPrintln(pretty)
+    if ("message" in json):
+        var w = gReadln("do you want to open image in browser? \p1y or n\p2: ")
+        if (w.lower() == "y"):
+            var image = json["message"]
+            webbrowser.open(image)
+        elif (w.lower() == "n"):
+            gPrintln("ok...")
+        else:
+            gPrintln("what")
+else:
+    gPrintln("error")
 ```
 
 **WAY better than SigmaGreg's syntax..**
