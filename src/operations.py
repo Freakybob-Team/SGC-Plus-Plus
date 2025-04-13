@@ -11,16 +11,16 @@ from utils import evaluate_expression
 def gPrintln(text, variables):
     try:
         if isinstance(text, str) and ',' in text:
-            parts = text.split(',')
+            parts = split_outside_quotes(text)
             results = []
             for part in parts:
                 part = part.strip()
                 result = process_print_item(part, variables)
                 results.append(result)
-            
+
             print(*results, sep=' ')
             return ' '.join(str(r) for r in results)
-    
+
         elif isinstance(text, str) and '+' in text and not any(op in text for op in ['+=', '-=', '*=', '/=']):
             parts = text.split('+')
             result = ''
@@ -30,15 +30,37 @@ def gPrintln(text, variables):
                 result += str(part_result)
             print(result)
             return result
-        
+
         else:
             result = process_print_item(text, variables)
             print(result)
             return result
-            
+
     except Exception as e:
         print(f"\033[31m[ERROR] Print error: {str(e)}\033[0m")
         return None
+
+def split_outside_quotes(s):
+    parts = []
+    current = ''
+    in_quotes = False
+    quote_char = ''
+    
+    for char in s:
+        if char in ['"', "'"]:
+            if in_quotes and char == quote_char:
+                in_quotes = False
+            elif not in_quotes:
+                in_quotes = True
+                quote_char = char
+        if char == ',' and not in_quotes:
+            parts.append(current.strip())
+            current = ''
+        else:
+            current += char
+    if current:
+        parts.append(current.strip())
+    return parts
 
 def process_print_item(text, variables):
     if isinstance(text, str) and text.startswith('f') and '{' in text and '}' in text:
