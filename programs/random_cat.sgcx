@@ -1,0 +1,34 @@
+import requests
+import sgcm
+import webbrowser
+
+var url = Null
+while (True):
+    var wow = gReadln("do you want gif or picture \p1g or p\p2: ")
+    if (wow.lower() == "g"):
+        url = "https://cataas.com/cat/gif?json=true"
+        break
+    elif (wow.lower() == "p"):
+        url = "https://cataas.com/cat?json=true"
+        break
+    else:
+        gPrintln("what")
+        continue
+
+var request = requests.get(url)
+
+if (request.status_code == 200):
+    var json = request.json()
+    var pretty = sgcm.prettyPrint(json)
+    gPrintln(pretty)
+    if ("url" in json):
+        var w = gReadln("do you want to open image in browser? \p1y or n\p2: ")
+        if (w.lower() == "y"):
+            var image = json["url"]
+            webbrowser.open(image)
+        elif (w.lower() == "n"):
+            gPrintln("ok...")
+        else:
+            gPrintln("what")
+else:
+    gPrintln("error")
