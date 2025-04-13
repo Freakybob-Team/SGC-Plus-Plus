@@ -210,8 +210,6 @@ def show_splash(config):
       # #     # #         #     #   
 #     # #     # #     #   #     #   
  #####   #####   #####              𝙍𝙐𝙉𝙉𝙀𝙍 𝒗1.1
-                                    
- 
            """
         ]
         for line in ascii_art:
