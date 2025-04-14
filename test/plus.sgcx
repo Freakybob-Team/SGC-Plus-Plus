@@ -1,0 +1,7 @@
+var x = 4
+var y = 5
+gPrintln(x + y) // 9
+
+var c = "4"
+var v = "5"
+gPrintln(c + v) // 45
