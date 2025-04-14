@@ -1,0 +1,7 @@
+var fruits = ["apple", "banana", "cherry", "date"]
+
+for fruit in fruits:
+    if fruit == "banana":
+        gPrintln("i LOVE bananas :3")
+    else:
+        gPrintln("I like", fruit)
