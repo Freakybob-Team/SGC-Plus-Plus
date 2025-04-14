@@ -22,14 +22,19 @@ def gPrintln(text, variables):
             return ' '.join(str(r) for r in results)
 
         elif isinstance(text, str) and '+' in text and not any(op in text for op in ['+=', '-=', '*=', '/=']):
-            parts = text.split('+')
-            result = ''
-            for part in parts:
-                part = part.strip()
-                part_result = process_print_item(part, variables)
-                result += str(part_result)
-            print(result)
-            return result
+            try:
+                result = evaluate_expression(text, variables)
+                print(result)
+                return result
+            except Exception:
+                parts = text.split('+')
+                result = ''
+                for part in parts:
+                    part = part.strip()
+                    part_result = process_print_item(part, variables)
+                    result += str(part_result)
+                print(result)
+                return result
 
         else:
             result = process_print_item(text, variables)
