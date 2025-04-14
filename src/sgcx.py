@@ -51,7 +51,7 @@ class interpreter:
             'pow': pow,
             'divmod': divmod,
             'all': all,
-            'any': any,
+            'any': any
         }
         for name in dir(math):
             if not name.startswith("__"):
@@ -693,7 +693,8 @@ class interpreter:
                         print(f"\033[31m[ERROR] Error on line {i+1}: {e}\033[0m")
                 i += 1
                 continue
-
+            
+            
             assign_match = re.match(r'(var|let)\s*(\w+)\[(\d+)\]\s*=\s*(.*)', line)
             if assign_match:
                 _, var_name, index, expr = assign_match.groups()
@@ -721,7 +722,7 @@ class interpreter:
                     print(f"\033[31m[ERROR] Error on line {i+1}: {e}\033[0m")
                 i += 1
                 continue
-
+            
             assign_match = re.match(r'(var|let|const)\s*(\w+)\s*=\s*(.*)', line)
             if assign_match:
                 _, var_name, expr = assign_match.groups()
@@ -770,7 +771,7 @@ class interpreter:
                         print(f"\033[31m[ERROR] Error on line {i+1}: {e}\033[0m")
                 i += 1
                 continue
-
+            
             reassign_match = re.match(r'(\w+)\s*=\s*(.*)', line)
             if reassign_match:
                 var_name, expr = reassign_match.groups()
@@ -817,6 +818,158 @@ class interpreter:
                         print(f"\033[31m[ERROR] Error on line {i+1}: {e}\033[0m")
                 i += 1
                 continue
+
+
+            multi_var_assign_match = re.match(r'(var|let|const)\s+([\w\s,]+)\s*=\s*(.*)', line)
+            if multi_var_assign_match:
+                decl_type, var_names_str, values_str = multi_var_assign_match.groups()
+                var_names = [name.strip() for name in var_names_str.split(',')]
+                
+                if ',' in values_str:
+                    values = []
+                    current_value = ""
+                    in_string = False
+                    string_char = None
+                    paren_level = 0
+                    bracket_level = 0
+                    
+                    for char in values_str:
+                        if char in ['"', "'"]:
+                            if not in_string:
+                                in_string = True
+                                string_char = char
+                            elif char == string_char:
+                                in_string = False
+                                
+                        if not in_string:
+                            if char == '(':
+                                paren_level += 1
+                            elif char == ')':
+                                paren_level -= 1
+                            elif char == '[':
+                                bracket_level += 1
+                            elif char == ']':
+                                bracket_level -= 1
+                                
+                        if char == ',' and not in_string and paren_level == 0 and bracket_level == 0:
+                            values.append(current_value.strip())
+                            current_value = ""
+                        else:
+                            current_value += char
+                            
+                    if current_value.strip():
+                        values.append(current_value.strip())
+                    
+                    if len(var_names) != len(values):
+                        print(f"\033[31m[ERROR] Number of variables ({len(var_names)}) doesn't match number of values ({len(values)})\033[0m")
+                    else:
+                        for var_idx, (var_name, value_expr) in enumerate(zip(var_names, values)):
+                            if var_name in self.system_variables:
+                                print(f"\033[31m[ERROR] '{var_name}' is a variable that cannot be changed due to being a system variable.\033[0m")
+                                continue
+                            if var_name in self.variables and decl_type == 'const':
+                                print(f"\033[31m[ERROR] Cannot redefine constant: {var_name}\033[0m")
+                                continue
+                                
+                            try:
+                                value_expr = value_expr.strip()
+                                if value_expr.lower() == 'null':
+                                    value = None
+                                elif value_expr.startswith("["):
+                                    value = eval(value_expr)
+                                elif value_expr.startswith("gPrintln"):
+                                    content_match = re.match(r'gPrintln\((.*?)\)', value_expr)
+                                    if content_match:
+                                        content = content_match.group(1).strip()
+                                        value = gPrintln(content, self.variables)
+                                    else:
+                                        print(f"\033[31m[ERROR] Invalid gPrintln format: {value_expr}\033[0m")
+                                        continue
+                                elif value_expr.startswith("gReadln"):
+                                    prompt_match = re.match(r'gReadln\((.*?)\)', value_expr)
+                                    if prompt_match:
+                                        prompt = prompt_match.group(1).strip()
+                                        value = gReadln(prompt, self.variables)
+                                    else:
+                                        print(f"\033[31m[ERROR] Invalid gReadln format: {value_expr}\033[0m")
+                                        continue
+                                elif re.match(r'(\w+)\((.*?)\)', value_expr) and re.match(r'(\w+)\((.*?)\)', value_expr).group(1) in self.functions:
+                                    func_match = re.match(r'(\w+)\((.*?)\)', value_expr)
+                                    func_name = func_match.group(1)
+                                    args_str = func_match.group(2).strip()
+            
+                                    args = []
+                                    if args_str:
+                                        arg_parts = self._parse_function_args(args_str)
+                                        for arg in arg_parts:
+                                            try:
+                                                arg_value = evaluate_expression(arg, self.variables)
+                                                args.append(arg_value)
+                                            except Exception as e:
+                                                print(f"\033[31m[ERROR] Error evaluating argument '{arg}': {e}\033[0m")
+                                                break
+            
+                                    value = self._call_function(func_name, args)
+                                else:
+                                    value = evaluate_expression(value_expr, {**self.variables, **self.builtins, **self.modules})
+                                    
+                                self.variables[var_name] = value
+                                if decl_type == 'const':
+                                    self.constants.add(var_name)
+                            except Exception as e:
+                                print(f"\033[31m[ERROR] Error evaluating value for '{var_name}': {e}\033[0m")
+                else:
+                    try:
+                        value_expr = values_str.strip()
+                        if value_expr.lower() == 'null':
+                            result = None
+                        elif value_expr.startswith("["):
+                            result = eval(value_expr)
+                        elif value_expr.startswith("gPrintln"):
+                            content = re.match(r'gPrintln\((.*?)\)', value_expr).group(1).strip()
+                            result = gPrintln(content, self.variables)
+                        elif value_expr.startswith("gReadln"):
+                            prompt = re.match(r'gReadln\((.*?)\)', value_expr).group(1).strip()
+                            result = gReadln(prompt, self.variables)
+                        elif re.match(r'(\w+)\((.*?)\)', value_expr) and re.match(r'(\w+)\((.*?)\)', value_expr).group(1) in self.functions:
+                            func_match = re.match(r'(\w+)\((.*?)\)', value_expr)
+                            func_name = func_match.group(1)
+                            args_str = func_match.group(2).strip()
+            
+                            args = []
+                            if args_str:
+                                arg_parts = self._parse_function_args(args_str)
+                                for arg in arg_parts:
+                                    try:
+                                        arg_value = evaluate_expression(arg, self.variables)
+                                        args.append(arg_value)
+                                    except Exception as e:
+                                        print(f"\033[31m[ERROR] Error evaluating argument '{arg}': {e}\033[0m")
+                                        break
+            
+                            result = self._call_function(func_name, args)
+                        else:
+                            result = evaluate_expression(value_expr, {**self.variables, **self.builtins, **self.modules})
+                        
+                        for var_name in var_names:
+                            if var_name in self.system_variables:
+                                print(f"\033[31m[ERROR] '{var_name}' is a variable that cannot be changed due to being a system variable.\033[0m")
+                                continue
+                            if var_name in self.variables and decl_type == 'const':
+                                print(f"\033[31m[ERROR] Cannot redefine constant: {var_name}\033[0m")
+                                continue
+                                
+                            self.variables[var_name] = result
+                            if decl_type == 'const':
+                                self.constants.add(var_name)
+                    except Exception as e:
+                        print(f"\033[31m[ERROR] Error on line {i+1}: {e}\033[0m")
+                
+                i += 1
+                continue
+            
+        
+                    
             
             func_match = re.match(r'func\s+(\w+)\((.*?)\):', line)
             if func_match:
