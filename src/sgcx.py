@@ -282,15 +282,12 @@ class interpreter:
         if len(args) != len(param_names):
             print(f"\033[31m[ERROR] Function '{func_name}' expects {len(param_names)} arguments, but got {len(args)}\033[0m")
             return None
-            
-        
+
         old_vars = self.variables.copy()
-        
-        
+
         for i, param in enumerate(param_names):
             self.variables[param] = args[i]
-            
-        
+
         result = None
         try:
             self.execute("\n".join(func_body))
@@ -301,10 +298,10 @@ class interpreter:
         except Exception as e:
             print(f"\033[31m[ERROR] Error in function '{func_name}': {e}\033[0m")
             
-        
         self.variables = old_vars
         
         return result
+
     
     def _process_f_string(self, f_string):
         if f_string.startswith('f"') or f_string.startswith("f'"):
@@ -325,6 +322,46 @@ class interpreter:
         
             return content
         return f_string
+    
+    
+    def _parse_function_args(self, args_str):
+        if not args_str.strip():
+            return []
+        args = []
+        current_arg = ""
+        in_string = False
+        string_char = None
+        paren_level = 0
+        bracket_level = 0
+        
+        for char in args_str:
+            if char in ['"', "'"]:
+                if not in_string:
+                    in_string = True
+                    string_char = char
+                elif char == string_char:
+                    in_string = False
+                    
+            if not in_string:
+                if char == '(':
+                    paren_level += 1
+                elif char == ')':
+                    paren_level -= 1
+                elif char == '[':
+                    bracket_level += 1
+                elif char == ']':
+                    bracket_level -= 1
+                    
+            if char == ',' and not in_string and paren_level == 0 and bracket_level == 0:
+                args.append(current_arg.strip())
+                current_arg = ""
+            else:
+                current_arg += char
+                
+        if current_arg.strip():
+            args.append(current_arg.strip())
+            
+        return args
     
     def execute(self, code):
         code = self.remove_comments(code)
@@ -714,16 +751,15 @@ class interpreter:
 
                             args = []
                             if args_str:
-                                for arg in re.findall(r'(?:[^,"]|"(?:\\.|[^"])*")++', args_str):
-                                    arg = arg.strip()
-                                if arg:  
+                                arg_parts = self._parse_function_args(args_str)
+                                for arg in arg_parts:
                                     try:
                                         value = evaluate_expression(arg, self.variables)
                                         args.append(value)
                                     except Exception as e:
                                         print(f"\033[31m[ERROR] Error evaluating argument '{arg}': {e}\033[0m")
                                         break
-    
+
                             result = self._call_function(func_name, args)
                         else:
                             result = evaluate_expression(expr, {**self.variables, **self.builtins, **self.modules})
@@ -764,16 +800,15 @@ class interpreter:
 
                             args = []
                             if args_str:
-                                for arg in re.findall(r'(?:[^,"]|"(?:\\.|[^"])*")++', args_str):
-                                    arg = arg.strip()
-                                if arg:  
+                                arg_parts = self._parse_function_args(args_str)
+                                for arg in arg_parts:
                                     try:
                                         value = evaluate_expression(arg, self.variables)
                                         args.append(value)
                                     except Exception as e:
                                         print(f"\033[31m[ERROR] Error evaluating argument '{arg}': {e}\033[0m")
                                         break
-    
+
                             result = self._call_function(func_name, args)
                         else:
                             result = evaluate_expression(expr, {**self.variables, **self.builtins, **self.modules})
@@ -804,27 +839,22 @@ class interpreter:
                 i = next_idx
                 continue
                 
-            
             func_call_match = re.match(r'(\w+)\((.*?)\)', line)
             if func_call_match and func_call_match.group(1) in self.functions:
                 func_name = func_call_match.group(1)
                 args_str = func_call_match.group(2).strip()
                 
+                args = []
                 if args_str:
-                    args = []
-                    
-                    for arg in re.findall(r'(?:[^,"]|"(?:\\.|[^"])*")++', args_str):
-                        arg = arg.strip()
-                        if arg:  
-                            try:
-                                value = evaluate_expression(arg, self.variables)
-                                args.append(value)
-                            except Exception as e:
-                                print(f"\033[31m[ERROR] Error evaluating argument '{arg}': {e}\033[0m")
-                                break
-                else:
-                    args = []
-                    
+                    arg_parts = self._parse_function_args(args_str)
+                    for arg in arg_parts:
+                        try:
+                            value = evaluate_expression(arg, self.variables)
+                            args.append(value)
+                        except Exception as e:
+                            print(f"\033[31m[ERROR] Error evaluating argument '{arg}': {e}\033[0m")
+                            break
+                
                 self._call_function(func_name, args)
                 i += 1
                 continue
