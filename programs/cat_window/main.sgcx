@@ -1,0 +1,15 @@
+import tkinter as tk
+
+var root = tk.Tk()
+root.title("wow")
+
+var image_path = "cat.gif"
+var tk_image = tk.PhotoImage(file=image_path)
+
+root.geometry(f"{tk_image.width()}x{tk_image.height()}")
+
+var label = tk.Label(root, image=tk_image)
+label.pack()
+
+
+root.mainloop()
