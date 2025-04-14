@@ -1,0 +1,38 @@
+import sgcm
+
+func upload(link):
+    sgcm.ferdinhaUpload(link)
+    
+func download(link, dest):
+    sgcm.webDownload(link, dest)
+    
+func main():
+    while (True):
+        gPrintln("=" * 50)
+        gPrintln("\twow welcome to cool web thing sgc++\n")
+        gPrintln("1. Download from web\n2. Ferdinha\n3. Exit")
+        gPrintln("=" * 50)
+        var user_input = gReadln(">>> ")
+        
+        if (user_input == 1):
+            var link_1 = gReadln("enter the link to download: ")
+            if (not link_1):
+                gPrintln("grrr")
+                continue
+            var dest = gReadln("full filename: ")
+            if (not dest):
+                gPrintln("grrr")
+                continue
+            download(link_1, dest)
+
+        elif (user_input == 2):
+            var link_2 = gReadln("enter path for ferdinha: ")
+            if (not link_2):
+                gPrintln("grrr")
+                continue
+            upload(link_2)
+        elif (user_input == 3):
+            gPrintln("bai bai!")
+            break
+            
+main()
