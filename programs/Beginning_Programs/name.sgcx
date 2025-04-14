@@ -1,0 +1,16 @@
+func ask(name):
+    gPrintln("hai " + name + "!!")
+    gPrintln("=" * 50)
+    
+func main():
+    while (True):
+        gPrintln("=" * 50)
+        var name = gReadln("what is your name: ")
+        if (not name):
+            gPrintln('put a name plz')
+            continue
+        else:
+            ask(name)
+            break
+            
+main()
