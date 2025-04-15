@@ -70,7 +70,7 @@ class interpreter:
 
         self.modules = {}
         self.module_aliases = {}
-        self.system_variables = {"__VERSION__": 1.7, "__AUTHOR__": "Freakybob-Team", "__LICENSE__": "MIT"}
+        self.system_variables = {"__VERSION__": 1.7, "__AUTHOR__": "Freakybob-Team", "__LICENSE__": "MIT", "__name__": "__main__"}
         self.variables.update(self.builtins)
         for var in self.system_variables:
             self.variables[var] = self.system_variables[var]
