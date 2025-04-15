@@ -1,0 +1,1 @@
+gPrintln("This is \033[31mred\033[0m, \033[32mgreen\033[0m, \033[33myellow\033[0m, \033[34mblue\033[0m, \033[35mmagenta\033[0m, \033[36mcyan\033[0m, and \033[37mwhite\033[0m text!\nHere's \033[1mbold\033[0m, \033[4munderlined\033[0m, and \033[3mitalic \p1not supported everywhere\p2\033[0m.\nYou can also mix: \033[1;35mbold magenta\033[0m or \033[4;36munderlined cyan\033[0m!")
