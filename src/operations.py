@@ -126,7 +126,21 @@ def process_escape_sequences(text):
     for escape_seq, replacement in escape_sequences.items():
         text = text.replace(escape_seq, replacement)
     
-    return text
+    i = 0
+    result = ""
+    while i < len(text):
+        if text[i:i+2] == '\\0' and i+4 < len(text) and text[i+2] == '3' and text[i+3] == '3':
+            end_idx = text.find('m', i+4)
+            if end_idx != -1:
+                ansi_seq = '\033' + text[i+4:end_idx+1]
+                result += ansi_seq
+                i = end_idx + 1
+                continue
+        
+        result += text[i]
+        i += 1
+    
+    return result
 
 def gReadln(prompt, variables):
     try:
