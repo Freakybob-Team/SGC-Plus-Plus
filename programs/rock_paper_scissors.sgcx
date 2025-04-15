@@ -1,0 +1,44 @@
+import random
+
+var choices = ["Rock", "Paper", "Scissors"]
+
+func game():
+    var user_score = 0
+    var computer_score = 0
+    
+    while user_score < 3 and computer_score < 3:
+        gPrintln("=" * 50)
+        var user_choice = gReadln("\nChoose Rock, Paper, or Scissors: ")
+        user_choice = user_choice.capitalize()
+
+        if user_choice not in choices:
+            gPrintln("vro there's 3 options, it's not that hard")
+            continue
+
+        var computer_choice = random.choice(choices)
+        gPrintln(f"\nYou chose {user_choice}, Computer chose {computer_choice}.")
+
+        if user_choice == computer_choice:
+            gPrintln("It's a tie!")
+        elif user_choice == "Rock" and computer_choice == "Scissors" or user_choice == "Scissors" and computer_choice == "Paper" or user_choice == "Paper" and computer_choice == "Rock":
+            gPrintln("You win this round!")
+            user_score += 1
+        else:
+            gPrintln("You lose this round...")
+            computer_score += 1
+
+        gPrintln(f"Score: You {user_score} - {computer_score} Computer\n")
+
+    if user_score > computer_score:
+        gPrintln("You won!")
+    else:
+        gPrintln("The computer won..")
+
+func main():
+    gPrintln("Rock Paper Scissors")
+    
+    game()
+    gPrintln("=" * 50)
+
+if __name__ == "__main__":
+    main()
