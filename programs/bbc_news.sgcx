@@ -1,0 +1,46 @@
+/*
+Stupid web scraper for bbc news made with bs4
+
+stupid news smh..
+
+squirrel acorns - 4/14/25 10:55 PM
+*/
+
+import requests
+from bs4 import BeautifulSoup
+
+func get_headlines(url):
+    var headers = {"User-Agent": "Mozilla/5.0"}
+    var response = requests.get(url, headers=headers)
+    if response.status_code != 200:
+        print("failed..")
+        return []
+        
+    var soup = BeautifulSoup(response.content, "html.parser")
+    var headlines = soup.select("h2")
+    var texts = []
+    for headline in headlines:
+        var text = headline.get_text(strip=True)
+        if text:
+            texts.append(text)
+    return texts
+
+func main():
+    gPrintln("doing random thing to get news from bbc news..\n")
+    var url = "https://www.bbc.com/news"
+    var headlines = get_headlines(url)
+    if not headlines:
+        gPrintln("nothing found haha")
+        
+    var count = 1
+    var what = min(10, len(headlines))
+    var i = 0
+    
+    while i < what:
+        gPrintln(f"{count}. {headlines[i]}")
+        count += 1
+        i += 1
+
+        
+if __name__ == "__main__":
+    main()
