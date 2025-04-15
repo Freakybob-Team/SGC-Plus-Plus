@@ -1,0 +1,6 @@
+func greg(name):
+    gPrintln("my name is " + name + " wow")
+    
+    
+if __name__ == "__main__":
+    greg("greg")
