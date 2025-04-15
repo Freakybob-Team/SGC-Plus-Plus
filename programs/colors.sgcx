@@ -1,0 +1,18 @@
+from colorama import *
+
+var ok = init(autoreset=True)
+
+func peak(text, var color="red"):
+    var color_map = {"red": Fore.RED, "green": Fore.GREEN, "blue": Fore.BLUE, "yellow": Fore.YELLOW, "cyan": Fore.CYAN, "magenta": Fore.MAGENTA, "white": Fore.WHITE}
+    var selected_color = color_map.get(color.lower(), Fore.RESET)
+    return f"{selected_color}{text}{Style.RESET_ALL}"
+    
+if __name__ == "__main__":
+    var cyan = peak("wow i'm cyan", "cyan")
+    var red = peak("wow i'm red", "red")
+    var blue = peak("wow blue", "blue")
+    var yellow = peak("wow yellow", "yellow")
+    var green = peak("green.. wow", "green")
+    var magenta = peak("greg magenta", "magenta")
+    var white = peak("white", "white")
+    gPrintln(cyan + "\n" + red + "\n" + blue + "\n" + yellow + "\n" + green + "\n" + magenta + "\n" + white)
