@@ -278,16 +278,40 @@ class interpreter:
         func_info = self.functions[func_name]
         func_body = func_info['body']
         param_names = func_info['params']
+        param_defaults = func_info.get('defaults', {})
         
-        if len(args) != len(param_names):
+        if len(args) < len(param_names):
+            missing_params = param_names[len(args):]
+            for param in missing_params:
+                if param not in param_defaults:
+                    print(f"\033[31m[ERROR] Function '{func_name}' expects {len(param_names)} arguments, but got {len(args)}\033[0m")
+                    return None
+        elif len(args) > len(param_names):
             print(f"\033[31m[ERROR] Function '{func_name}' expects {len(param_names)} arguments, but got {len(args)}\033[0m")
             return None
-
+    
         old_vars = self.variables.copy()
-
-        for i, param in enumerate(param_names):
+        
+        for i, param in enumerate(param_names[:len(args)]):
             self.variables[param] = args[i]
-
+            
+        for i in range(len(args), len(param_names)):
+            param = param_names[i]
+            if param in param_defaults:
+                default_info = param_defaults[param]
+                decl_type = default_info['decl_type']
+                expr = default_info['expr']
+                
+                try:
+                    result = evaluate_expression(expr, {**self.variables, **self.builtins, **self.modules})
+                    self.variables[param] = result
+                    if decl_type == 'const':
+                        self.constants.add(param)
+                except Exception as e:
+                    print(f"\033[31m[ERROR] Error evaluating default value for parameter '{param}': {e}\033[0m")
+                    self.variables = old_vars
+                    return None
+    
         result = None
         try:
             self.execute("\n".join(func_body))
@@ -975,7 +999,81 @@ class interpreter:
             if func_match:
                 func_name = func_match.group(1)
                 params_str = func_match.group(2).strip()
-                params = [p.strip() for p in params_str.split(',')] if params_str else []
+                params = []
+                param_defaults = {}
+                
+                if params_str:
+                    param_parts = []
+                    current_part = ""
+                    in_string = False
+                    string_char = None
+                    paren_level = 0
+                    bracket_level = 0
+                    
+                    for char in params_str:
+                        if char in ['"', "'"]:
+                            if not in_string:
+                                in_string = True
+                                string_char = char
+                            elif char == string_char:
+                                in_string = False
+                                
+                        if not in_string:
+                            if char == '(':
+                                paren_level += 1
+                            elif char == ')':
+                                paren_level -= 1
+                            elif char == '[':
+                                bracket_level += 1
+                            elif char == ']':
+                                bracket_level -= 1
+                                
+                        if char == ',' and not in_string and paren_level == 0 and bracket_level == 0:
+                            param_parts.append(current_part.strip())
+                            current_part = ""
+                        else:
+                            current_part += char
+                            
+                    if current_part.strip():
+                        param_parts.append(current_part.strip())
+                    
+                    for param in param_parts:
+                        param = param.strip()
+                        if not param:
+                            continue
+                            
+                        if "=" in param:
+                            var_match = re.match(r'(var|let|const)?\s*(\w+)\s*=\s*(.*)', param)
+                            if var_match:
+                                decl_type, param_name, default_expr = var_match.groups()
+                                params.append(param_name)
+                                param_defaults[param_name] = {
+                                    'expr': default_expr,
+                                    'decl_type': decl_type or 'var'
+                                }
+                            else:
+                                parts = param.split('=', 1)
+                                param_name = parts[0].strip()
+                                default_expr = parts[1].strip()
+                                params.append(param_name)
+                                param_defaults[param_name] = {
+                                    'expr': default_expr,
+                                    'decl_type': 'var'
+                                }
+                        elif ":" in param:
+                            type_match = re.match(r'(var|let|const)?\s*(\w+)\s*:\s*(\w+)', param)
+                            if type_match:
+                                decl_type, param_name, _ = type_match.groups()
+                                params.append(param_name)
+                            else:
+                                params.append(param)
+                        else:
+                            var_match = re.match(r'(var|let|const)?\s*(\w+)', param)
+                            if var_match:
+                                _, param_name = var_match.groups()
+                                params.append(param_name)
+                            else:
+                                params.append(param)
                 
                 func_body, next_idx = self._get_indented_block(lines, i+1, curr_indent)
                 
@@ -986,11 +1084,13 @@ class interpreter:
                     
                 self.functions[func_name] = {
                     'params': params,
+                    'defaults': param_defaults,
                     'body': func_body
                 }
                 
                 i = next_idx
                 continue
+
                 
             func_call_match = re.match(r'(\w+)\((.*?)\)', line)
             if func_call_match and func_call_match.group(1) in self.functions:
