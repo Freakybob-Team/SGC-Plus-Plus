@@ -13,7 +13,8 @@ import os
 
 func clear_screen():
     time.sleep(1)
-    if (os.name == 'nt'):
+    var g = os.name
+    if (g == 'nt'):
         os.system('cls')
     else:
         os.system('clear')
