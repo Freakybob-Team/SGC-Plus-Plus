@@ -76,25 +76,6 @@ class interpreter:
             self.variables[var] = self.system_variables[var]
             self.constants.add(var)
 
-        self.type_mappings = {
-            'String': str,
-            'Int': int,
-            'Float': float,
-            'Boolean': bool,
-            'List': list,
-            'Dict': dict,
-            'Tuple': tuple,
-            'Set': set,
-        }
-
-        self.modules = {}
-        self.module_aliases = {}
-        self.system_variables = {"__VERSION__": 1.6, "__AUTHOR__": "Freakybob-Team", "__LICENSE__": "MIT"}
-        self.variables.update(self.builtins)
-        for var in self.system_variables:
-            self.variables[var] = self.system_variables[var]
-            self.constants.add(var)
-
 
     def remove_comments(self, code):
         string_pattern = r'(\".*?\"|\'.*?\')'
