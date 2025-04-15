@@ -1,0 +1,15 @@
+var lines = []
+var count = 1
+
+while True:
+    var prompt = "Line " + str(count) + ": "
+    var line = gReadln(prompt)
+    if line.lower() == "end":
+        break
+    elif line:
+        lines.append(line)
+        count += 1
+    else:
+        break
+var text = '\n'.join(lines)
+gPrintln(text)
