@@ -51,7 +51,8 @@ class interpreter:
             'pow': pow,
             'divmod': divmod,
             'all': all,
-            'any': any
+            'any': any,
+            'add': set.add
         }
         for name in dir(math):
             if not name.startswith("__"):
