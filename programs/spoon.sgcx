@@ -1,0 +1,247 @@
+/* import random */ //  will be prob be needed in the future
+import time
+
+var spoonname: String = ""
+var username: String = ""
+var money: Int = 777
+var xp: Int = 0
+func main():
+    var what: String = ""
+    gPrintln("-" * 90 + "\n")
+    gPrintln("                                         ")
+    gPrintln("  ____  _____     ___     ___     ___    ")
+    gPrintln(" /',__\/\ '__`\  / __`\  / __`\ /' _ `\  ")
+    gPrintln("/\__, `\ \ \L\ \/\ \L\ \/\ \L\ \/\ \/\ \ ")
+    gPrintln("\/\____/\ \ ,__/\ \____/\ \____/\ \_\ \_\")
+    gPrintln(" \/___/  \ \ \/  \/___/  \/___/  \/_/\/_/")
+    gPrintln("          \ \_\                          ")
+    gPrintln("           \/_/                          ")
+    gPrintln("Pet Spoon Game, made by 5quirre1 and Nomaakip. Recreated in SGC++ by 5quirre1.\n")
+    gPrintln("Welcome to Spoon. Say 'Info' for what Spoon is about.\nSay 'Start' to continue on your adventure of taking care of a spoon rgeg\n")
+    gPrintln("-" * 90 + "\n")
+    while True:
+        what = gReadln(">>> ")
+        if what.lower() == "info":
+            start_info()
+            break
+        elif what.lower() == "start":
+            start()
+            break
+        else:
+            gPrintln("choose an option greg")
+            continue
+        
+func start_info():
+    var ok: String = ""
+    gPrintln("\nThis game is about taking care of a pet spoon. Don't ask why cause like, it's very useful lmao\nSome stuff that is going to be updated in later updates:\n\nA saving system\nRandom events when you like use the command 'Check' or something\nRandom cool stuff\nDo You want to know some bugs that have been found? \p1Say 'Bugs' or say 'No' to start\p2\n")
+    ok = gReadln(">>> ")
+    if ok.lower() == "bugs":
+        start_bugs()
+    elif ok.lower() == "no":
+        start()
+    else:
+        main()
+        
+func start_bugs():
+    gPrintln("being made by me\n")
+    main()
+
+func adoption():
+    gPrintln("\n-------------------------------------------------------\n")
+    gPrintln("Dominic: Welcome to the spoon adoption place, I am the granpapa of all the\nspoons here, greg. Wait, You're not greg, what is your name, random person?\n")
+    username = gReadln("you: ")
+    if username.lower() == "greg":
+        gPrintln("oh, so you are greg, mb\n")
+    elif not username:
+        gPrintln("Dominic: oh no name.. your name is greg now")
+        username = "greg"
+    gPrintln("Dominic: K so " + username + " let's take you over to the spoon viewing area so you can check out the pet spoons")
+    gPrintln("-------------------------------------------------------")
+    viewingarea()
+    
+func viewingarea():
+    var buy: String = ""
+    var useroption: String = ""
+    var buy2: String = ""
+    var buy3: String = ""
+    
+    gPrintln("\nDominic: Welcome to the viewing area where you will find your pet spoon for life")
+    gPrintln("Dominic: There is only one pet spoon left. It's a She and is 7 months old\n")
+    gPrintln("Dominic: Do you want to buy her? She's only $3\n")
+    gPrintln("You have $800, y/n\n")
+    while (True):
+        buy = gReadln("you: ")
+        if buy.lower() == "y":
+            money -= 3
+            gPrintln("\nYou have bought your very first pet spoon! Now that you have bought a pet spoon, you're gonna need some supplies so that you can take care of your spoon!\n\n")
+            store_at_start()
+            break
+            
+        elif buy.lower() == "n":
+            gPrintln("grr..")
+            exit(69)
+        elif buy.lower() == "quit":
+            gPrintln("i am smhing my head")
+            exit(69999999999999999999999)
+        else:
+            gPrintln("what choose a option dummy")
+            continue
+            
+func store_at_start():
+    var foodbuy: String = ""
+    var essentialsbuy: String = ""
+    while True:
+        gPrintln("-------------------------------------------------------\n")
+        gPrintln("\nWelcome to the Spoon pet shop! This place will have everything you'll ever need to take care of your spoon! We also have a deal on so it's your lucky day!\n\n")
+        gPrintln("We'll start off by buying some food for your pet spoon. Buy all of them by typing 'All'\n\n")
+        gPrintln("School pizza      Bread       Watermelon\n")
+        gPrintln("     $3            $1             $3            \n")
+        gPrintln(f"You have ${money}")
+        foodbuy = gReadln("you: ")
+        if foodbuy.lower() == "all":
+            gPrintln("You have bought school pizza, Bread, Watermelon!\n")
+            money -= 7
+            gPrintln(f"You now have ${money} left!")
+            break
+        else:
+            gPrintln("-------------------------------------------------------\n")
+            gPrintln("I think you meant to say 'All' but that was too hard for you. Try again.\n")
+            continue
+    while True:
+        gPrintln("-------------------------------------------------------")
+        gPrintln("\n\nGreat! Now that you have food to feed your pet spoon, let's get some essentials that will make your life and your spoon's life easier!\n")
+        gPrintln("I recommend buy all of these. Type 'All'.\n\n")
+        gPrintln("Yummy oil  Dishwasher pods   Collar   Bed\n")
+        gPrintln("   $3            $5            $3     $9\n\n")
+        gPrintln(f"You have ${money}")
+        essentialsbuy = gReadln("you: ")
+        if essentialsbuy.lower() == "all":
+            gPrintln("You have bought Yummy oil, Dishwasher pods, collar and a bed!\n")
+            money -= 20
+            gPrintln(f"You now have ${money} left!")
+            break
+        else:
+            gPrintln("-------------------------------------------------------\n")
+            gPrintln("I think you meant to say 'All' but that was too hard for you. Try again.\n")
+            continue
+    gPrintln("-------------------------------------------------------")
+    gPrintln("\nCongrats! You have everything you'll need for your pet spoon! The Store is always open for you to buy more supplies!\nI hope you enjoy your time as a new spoon owner!!")
+    tutoriel()
+    
+func call():
+    while True:
+        call_tot = gReadln("you: ")
+        if call_tot.lower() == "skip":
+            gPrintln("skipping..")
+            game()
+            break
+        elif not call_tot.lower() == spoonname:
+            gPrintln("that's not your spoon's name!")
+            continue
+            
+        elif call_tot.lower() == spoonname:
+            gPrintln(spoonname + " walked over to you!")
+            break
+
+func tutoriel_food_option():
+    while True:
+        gPrintln("Good job! let's give our spoon some bread! Type 'Bread'\n")
+        gPrintln("School pizza      Bread       Watermelon\n")
+        food_options = gReadln("you: ")
+        if not food_options:
+            gPrintln(f"get some bread for {spoonname}!\n")
+            continue
+        elif food_options.lower() == "bread":
+            gPrintln(f"you fed {spoonname} bread! she enjoyed it!\n")
+            break
+        else:
+            gPrintln(f"{spoonname} wants some bread! give the bread.")
+            
+
+func tutoriel():
+    var call_tot: String = ""
+    var options: String = ""
+    var food_options: String = ""
+    var feed: String = ""
+    var understand: String = ""
+    
+    gPrintln("\n-------------------------------------------------------")
+    gPrintln("\nYou have brought your spoon home! While she explores the house, you need to give her a name!\nWhat should their name be?\n")
+    while True:
+        spoonname = gReadln("spoon name: ")
+        spoonname = spoonname.lower()
+        if not spoonname:
+            gPrintln("give your spoon a name!")
+            continue
+        else:
+            gPrintln("\nYour spoon has been named " + spoonname + "!\n")
+            break
+    gPrintln("-------------------------------------------------------\n")
+    gPrintln(spoonname + " walks around her new house.")
+    gPrintln(f"You can call your spoon over by typing '{spoonname}'! Try it out! \p1you can also type 'skip' to skip the tutoriel\p2\n")
+    call()
+    gPrintln("\nGood job! Now that we know how to call our spoon, let's learn how to feed our spoon!\n")
+    gPrintln("To give food to your spoon, call your spoon and then type 'Feed'! Try it out!\n")
+    call()
+    gPrintln("\nnow type 'Feed'!")
+    while True:
+        options = gReadln("you: ")
+        if options.lower() == "feed":
+            tutoriel_food_option()
+            break
+        else:
+            gPrintln("Type 'Feed' to feed " + spoonname)
+            continue
+    gPrintln("\nGood Job!! Our Spoon is now full from one slice of bread \p1ig\p2\n")
+    gPrintln("Now that we know how to feed our spoon, let's learn how to give our spoon a bath!\n")
+    call()
+    gPrintln("now type 'Bath'!!!")
+    while True:
+        options = gReadln("you: ")
+        if options.lower() == "bath":
+            gPrintln("\nYou bring " + spoonname + " to the sink.\nYou put some of the Dishsoap that you bought fron the pet shop on her.\nYou start to clean " + spoonname + " until she is completly clean!")
+            break
+        else:
+            gPrintln("Type 'Bath' to give a bath to " + spoonname)
+            continue
+    gPrintln("Your pet spoon is bored. Let's take your pet spoon on a walk! To take your pet on a walk, call your pet and Enter 'Walk'\n")
+    call()
+    gPrintln("Now type 'Walk'!!!")
+    while True:
+        options = gReadln("you: ")
+        if options.lower() == "walk":
+            gPrintln("You're going on a walk with " + spoonname + "!! Yay!\n")
+            gPrintln(spoonname + " meets pet fork. It seems like they're having fun!\n")
+            gPrintln(spoonname + " now has a friend, Yayayaya!\n")
+            xp += 10
+            gPrintln("-------------------------------------------------------\n")
+            gPrintln(f"+ {xp} xp. You now have {xp} xp!")
+            break
+        else:
+            gPrintln("Type 'Walk' to give " + spoonname + " a walk!")
+            continue
+    gPrintln("\nCongrats, you just did the tutorial! You have learned all the basics on how to take care of your spoon!\n")
+    gPrintln("Do You understand everything? \p1Yes or no\p2\n")
+    understand = gReadln("you: ")
+    while True:
+        if understand.lower() == "yes":
+            gPrintln("wow ok let's start!!!\n")
+            break
+        elif understand.lower() == "no":
+            gPrintln("oh.. ok..\n")
+            tutorial()
+            break
+        else:
+            gPrintln("plz do option greg")
+            continue
+func game():
+    gPrintln("i'm sick of this.")
+    gPrintln("aHHHH")
+    // will finish later
+            
+func start():
+    adoption()
+    
+    
+if __name__ == "__main__":
+    main()
