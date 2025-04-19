@@ -226,6 +226,7 @@ func tutoriel():
     while True:
         if understand.lower() == "yes":
             gPrintln("wow ok let's start!!!\n")
+            game()
             break
         elif understand.lower() == "no":
             gPrintln("oh.. ok..\n")
