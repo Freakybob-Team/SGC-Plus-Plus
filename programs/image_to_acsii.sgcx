@@ -1,0 +1,99 @@
+/*
+
+makes images into ascii stuff
+made by squirrel acorns 4/18/25
+
+*/
+
+import cv2
+import sgcm
+
+var ASCII_CHARS = "@%#*+=-:. "
+
+func read_image(path):
+    var image = cv2.imread(path)
+    return image
+
+func convert_to_grayscale(image):
+    var gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    return gray
+
+func resize_image(image, target_width):
+    var h = image.shape[0]
+    var w = image.shape[1]
+    var aspect_ratio = h / w / 2
+    var target_height = int(target_width * aspect_ratio)
+    var size = (target_width, target_height)
+    var resized = cv2.resize(image, size)
+    return resized
+
+func pixels_to_ascii(image):
+    var ascii_image = ""
+    var h = image.shape[0]
+    var w = image.shape[1]
+
+    var y = 0
+    while y < h:
+        var row = ""
+        var x = 0
+        while x < w:
+            var pixel = image[y][x]
+            var value = int(pixel / 25)
+            if value < 0:
+                value = 0
+            if value > 9:
+                value = 9
+            var char = ASCII_CHARS[value]
+            row = row + char
+            x = x + 1
+        ascii_image = ascii_image + row
+        ascii_image = ascii_image + "\n"
+        y = y + 1
+
+    return ascii_image
+
+func convert_image_to_ascii(image_path):
+    var image = read_image(image_path)
+    var gray = convert_to_grayscale(image)
+    var resized = resize_image(gray, 50)
+    var ascii_result = pixels_to_ascii(resized)
+    return ascii_result
+
+while True:
+    var path = gReadln("put the file path of the image: ")
+    if not path:
+        gPrintln("put a path plz greg")
+        continue
+    else:
+        gPrintln("ok making ")
+        break
+
+var result = convert_image_to_ascii(path)
+gPrintln(result)
+gPrintln("=" * 50)
+
+while True:
+    var okwow = gReadln("would you like to save to file? \p1y or n\p2 ")
+    
+    if not okwow:
+        gPrintln("no choice so prob no")
+        break
+    elif okwow.lower() == "y":
+        var file_name = gReadln("filename: ")
+        
+        if not file_name:
+            gPrintln("since no filename, it's gonna be called greg")
+            file_name = "greg"
+
+        if ".txt" not in file_name.lower():
+            file_name = file_name + ".txt"
+    
+        sgcm.write(file_name, "w", result)
+        gPrintln("file was made!!!")
+        break
+    elif okwow.lower() == "n":
+        gPrintln("ok")
+        break
+    else:
+        gPrintln("huh? Please answer with 'y' or 'n'.")
+        continue
