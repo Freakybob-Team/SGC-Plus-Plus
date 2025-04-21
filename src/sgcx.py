@@ -52,7 +52,8 @@ class interpreter:
             'divmod': divmod,
             'all': all,
             'any': any,
-            'add': set.add
+            'add': set.add,
+            'open': open,
         }
         for name in dir(math):
             if not name.startswith("__"):
@@ -389,27 +390,32 @@ class interpreter:
             
             while_match = re.match(r'while\s+(.*?):', line)
             if while_match:
-                condition = while_match.group(1)
-                loop_body, next_idx = self._get_indented_block(lines, i+1, curr_indent)
-                
+                condition_expr = while_match.group(1)
+                loop_body, next_idx = self._get_indented_block(lines, i + 1, curr_indent)
+            
                 if not loop_body:
-                    print(f"\033[31m[ERROR] Empty while loop body on line {i+1}\033[0m")
+                    print(f"\033[31m[ERROR] Empty while loop body on line {i + 1}\033[0m")
                     i = next_idx
                     continue
-                    
-                while bool(evaluate_expression(condition, self.variables)):
-                    self.variables.pop('continue', None)  
-                    self.execute("\n".join(loop_body))
-                    
-                    if 'break' in self.variables:
-                        del self.variables['break']
+
+                while True:
+                    condition_result = evaluate_expression(condition_expr, self.variables)
+            
+                    if not condition_result:
                         break
-                    
-                    if 'continue' in self.variables:
-                        del self.variables['continue']
-                        
+            
+                    self.variables.pop('continue', None)
+                    self.execute("\n".join(loop_body))
+            
+                    if self.variables.pop('break', None):
+                        break
+            
+                    if self.variables.pop('continue', None):
+                        continue
+            
                 i = next_idx
                 continue
+
 
 
             for_match = re.match(r'for\s+(.*?):', line)
@@ -1125,7 +1131,7 @@ class interpreter:
                 i += 1
                 continue
 
-            elif re.match(r'^\w+\.\w+\(.*\)', line): 
+            elif re.match(r'^(?:\w+\.)+\w+\(.*\)', line):
                 try:
                     evaluate_expression(line, {**self.variables, **self.modules})
                 except Exception as e:
@@ -1134,17 +1140,76 @@ class interpreter:
                 continue
             
             elif line.startswith("gPrintln"):
-                content = re.match(r'gPrintln\((.*?)\)', line).group(1).strip()
-                gPrintln(content, self.variables)
+                gprint_match = re.match(r'gPrintln\((.*?)(?:,\s*end\s*=\s*([^)]+))?\)', line)
+                if gprint_match:
+                    content = gprint_match.group(1).strip()
+                    end_param = gprint_match.group(2)
+                    if end_param:
+                        try:
+                            end_value = evaluate_expression(end_param, self.variables)
+                            gPrintln(content, self.variables, end=end_value)
+                        except Exception as e:
+                            print(f"\033[31m[ERROR] Error evaluating end parameter: {e}\033[0m")
+                            gPrintln(content, self.variables)
+                    else:
+                        gPrintln(content, self.variables)
+                else:
+                    content = re.match(r'gPrintln\((.*?)\)', line).group(1).strip()
+                    gPrintln(content, self.variables)
                 i += 1
                 continue
+
 
             elif line.startswith("gReadln"):
                 prompt = re.match(r'gReadln\((.*?)\)', line).group(1).strip()
                 gReadln(prompt, self.variables)
                 i += 1
                 continue
-
+            
+            """
+            Todo: Fix not being able to use functions for the with statement stuff
+                  uhhh idfk what else, I'll test more later.
+                  everything
+            """
+            with_match = re.match(r'with\s+(.*?)(?:\s+as\s+(\w+))?:', line)
+            if with_match:
+                context_expr = with_match.group(1)
+                as_var = with_match.group(2)
+                
+                with_block, next_idx = self._get_indented_block(lines, i+1, curr_indent)
+                
+                if not with_block:
+                    print(f"\033[31m[ERROR] Empty with block on line {i+1}\033[0m")
+                    i = next_idx
+                    continue
+                
+                try:
+                    context_manager = evaluate_expression(context_expr, self.variables)
+                    
+                    if not hasattr(context_manager, '__enter__') or not hasattr(context_manager, '__exit__'):
+                        print(f"\033[31m[ERROR] Expression is not a context manager on line {i+1}\033[0m")
+                        i = next_idx
+                        continue
+                    
+                    value = context_manager.__enter__()
+                    
+                    if as_var:
+                        self.variables[as_var] = value
+                    
+                    try:
+                        self.execute("\n".join(with_block))
+                    except Exception as exc:
+                        if not context_manager.__exit__(type(exc), exc, exc.__traceback__):
+                            raise exc
+                    else:
+                        context_manager.__exit__(None, None, None)
+                        
+                except Exception as e:
+                    print(f"\033[31m[ERROR] Error in with statement on line {i+1}: {e}\033[0m")
+                
+                i = next_idx
+                continue
+            
             else:
                 print(f"\033[31m[ERROR] Syntax Error on line {i+1}: Unrecognized statement: {line} \033[0m")
                 i += 1
