@@ -1,0 +1,14 @@
+/*
+
+testing a with statement to make a file called "text.txt" and content with "wow sgc++ is amazing"
+
+Squirrel Acorns - April 21 2025, 1:38 PM
+
+*/
+
+const filename = "test.txt"
+const file_stuff = "wow sgc++ is amazing"
+
+with open(filename, "w") as file:
+    file.write(file_stuff)
+gPrintln("file was made!!! \p1I hope..\p2")
