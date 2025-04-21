@@ -8,8 +8,9 @@ A remake of SigmaGreg.
 - [x] Functions **(new, expect bugs)**
 - [x] If statements
 - [x] Typing for variables **(new, expect bugs)**
-- [x] While loops **(new, needs to be fixed)**
-- [x] For loops   **(new, needs to be fixed)**
+- [x] While loops **(new, expect bugs)**
+- [x] For loops   **(new, expect bugs)**
+- [x] With statements **(new, needs to be fixed)** 
 - [x] Input
 - [x] Output **(ass)**
 - [x] Comments
