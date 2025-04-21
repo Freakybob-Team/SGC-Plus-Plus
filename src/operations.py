@@ -8,7 +8,7 @@ This module provides functions for performing operations in SGC++. The functions
 
 from utils import evaluate_expression
 
-def gPrintln(text, variables):
+def gPrintln(text, variables, end="\n"):
     try:
         if isinstance(text, str) and ',' in text:
             parts = split_outside_quotes(text)
@@ -18,13 +18,13 @@ def gPrintln(text, variables):
                 result = process_print_item(part, variables)
                 results.append(result)
 
-            print(*results, sep=' ')
+            print(*results, sep=' ', end=end)
             return ' '.join(str(r) for r in results)
 
         elif isinstance(text, str) and '+' in text and not any(op in text for op in ['+=', '-=', '*=', '/=']):
             try:
                 result = evaluate_expression(text, variables)
-                print(result)
+                print(result, end=end)
                 return result
             except Exception:
                 parts = text.split('+')
@@ -33,12 +33,12 @@ def gPrintln(text, variables):
                     part = part.strip()
                     part_result = process_print_item(part, variables)
                     result += str(part_result)
-                print(result)
+                print(result, end=end)
                 return result
 
         else:
             result = process_print_item(text, variables)
-            print(result)
+            print(result, end=end)
             return result
 
     except Exception as e:
@@ -49,22 +49,36 @@ def split_outside_quotes(s):
     parts = []
     current = ''
     in_quotes = False
-    quote_char = ''
+    quote_char = None
     
-    for char in s:
+    i = 0
+    while i < len(s):
+        char = s[i]
+
         if char in ['"', "'"]:
-            if in_quotes and char == quote_char:
-                in_quotes = False
-            elif not in_quotes:
+            if not in_quotes:
                 in_quotes = True
                 quote_char = char
-        if char == ',' and not in_quotes:
+            elif char == quote_char:
+                if i > 0 and s[i-1] == '\\':
+                    current += char
+                else:
+                    in_quotes = False
+                    quote_char = None
+            current += char
+            
+        elif char == ',' and not in_quotes:
             parts.append(current.strip())
             current = ''
+
         else:
             current += char
+        
+        i += 1
+            
     if current:
         parts.append(current.strip())
+    
     return parts
 
 def process_print_item(text, variables):
