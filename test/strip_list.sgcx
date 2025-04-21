@@ -1,0 +1,3 @@
+var my_list = ['apple', 'banana', 'cherry']
+var result_string = ', '.join(my_list)
+gPrintln(result_string)
