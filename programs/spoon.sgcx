@@ -131,11 +131,7 @@ func store_at_start():
 func call():
     while True:
         call_tot = gReadln("you: ")
-        if call_tot.lower() == "skip":
-            gPrintln("skipping..")
-            game()
-            break
-        elif not call_tot.lower() == spoonname:
+        if not call_tot.lower() == spoonname:
             gPrintln("that's not your spoon's name!")
             continue
             
@@ -178,7 +174,7 @@ func tutoriel():
             break
     gPrintln("-------------------------------------------------------\n")
     gPrintln(spoonname + " walks around her new house.")
-    gPrintln(f"You can call your spoon over by typing '{spoonname}'! Try it out! \p1you can also type 'skip' to skip the tutoriel\p2\n")
+    gPrintln(f"You can call your spoon over by typing '{spoonname}'! Try it out\n")
     call()
     gPrintln("\nGood job! Now that we know how to call our spoon, let's learn how to feed our spoon!\n")
     gPrintln("To give food to your spoon, call your spoon and then type 'Feed'! Try it out!\n")
