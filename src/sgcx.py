@@ -54,6 +54,7 @@ class interpreter:
             'any': any,
             'add': set.add,
             'open': open,
+            'isdigit': str.isdigit,
         }
         for name in dir(math):
             if not name.startswith("__"):
@@ -1121,8 +1122,7 @@ class interpreter:
                         self.variables['return_value'] = None
                 except Exception as e:
                     print(f"\033[31m[ERROR] Error in return statement: {e}\033[0m")
-                break  
-
+                break
 
 
 
@@ -1166,36 +1166,73 @@ class interpreter:
                 i += 1
                 continue
             
-            """
-            Todo: Fix not being able to use functions for the with statement stuff
-                  uhhh idfk what else, I'll test more later.
-                  everything
-            """
+
             with_match = re.match(r'with\s+(.*?)(?:\s+as\s+(\w+))?:', line)
             if with_match:
                 context_expr = with_match.group(1)
                 as_var = with_match.group(2)
-                
+            
                 with_block, next_idx = self._get_indented_block(lines, i+1, curr_indent)
-                
+            
                 if not with_block:
                     print(f"\033[31m[ERROR] Empty with block on line {i+1}\033[0m")
                     i = next_idx
                     continue
-                
+            
                 try:
-                    context_manager = evaluate_expression(context_expr, self.variables)
-                    
+            
+                    try:
+                        context_manager = evaluate_expression(context_expr, {**self.variables, **self.builtins, **self.modules})
+                    except Exception as e:
+            
+                        module_func_match = re.match(r'(\w+)\.(\w+)\((.*?)\)', context_expr)
+                        if module_func_match:
+                            module_name, func_name, args_str = module_func_match.groups()
+            
+                            if module_name in self.modules:
+                                module_obj = self.modules[module_name]
+                            elif module_name in self.variables:
+                                module_obj = self.variables[module_name]
+                            else:
+                                print(f"\033[31m[ERROR] Module '{module_name}' not found on line {i+1}\033[0m")
+                                i = next_idx
+                                continue
+            
+                            if hasattr(module_obj, func_name):
+                                func = getattr(module_obj, func_name)
+            
+                                args = []
+                                if args_str.strip():
+                                    arg_parts = self._parse_function_args(args_str)
+                                    for arg in arg_parts:
+                                        try:
+                                            value = evaluate_expression(arg, {**self.variables, **self.builtins, **self.modules})
+                                            args.append(value)
+                                        except Exception as arg_err:
+                                            print(f"\033[31m[ERROR] Error evaluating argument '{arg}': {arg_err}\033[0m")
+                                            raise arg_err
+            
+                                context_manager = func(*args)
+                            else:
+                                print(f"\033[31m[ERROR] Function '{func_name}' not found in module '{module_name}' on line {i+1}\033[0m")
+                                i = next_idx
+                                continue
+                        else:
+            
+                            print(f"\033[31m[ERROR] Invalid context expression on line {i+1}: {e}\033[0m")
+                            i = next_idx
+                            continue
+            
                     if not hasattr(context_manager, '__enter__') or not hasattr(context_manager, '__exit__'):
                         print(f"\033[31m[ERROR] Expression is not a context manager on line {i+1}\033[0m")
                         i = next_idx
                         continue
-                    
+            
                     value = context_manager.__enter__()
-                    
+            
                     if as_var:
                         self.variables[as_var] = value
-                    
+            
                     try:
                         self.execute("\n".join(with_block))
                     except Exception as exc:
@@ -1203,16 +1240,11 @@ class interpreter:
                             raise exc
                     else:
                         context_manager.__exit__(None, None, None)
-                        
+            
                 except Exception as e:
                     print(f"\033[31m[ERROR] Error in with statement on line {i+1}: {e}\033[0m")
-                
-                i = next_idx
-                continue
             
-            else:
-                print(f"\033[31m[ERROR] Syntax Error on line {i+1}: Unrecognized statement: {line} \033[0m")
-                i += 1
+                i = next_idx
                 continue
                 
 
