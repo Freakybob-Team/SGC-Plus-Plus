@@ -4,7 +4,7 @@ SGC++
 This module provides a simple interface for interacting with the SGC++ language. It includes methods for executing SGC++ code, if statements, while statements, for statements, handling variables, functions, function calls, and removing comments.
 """
 import re
-from operations import gPrintln, gReadln
+from operations import gPrint, gPrintln, gReadln
 from utils import evaluate_expression
 import importlib
 import os
@@ -371,6 +371,33 @@ class interpreter:
             
         return args
     
+    
+    def _extract_function_contents(self, line, function_name):
+        open_parens = 0
+        in_quotes = False
+        quote_char = None
+        start_idx = len(function_name) + 1
+        
+        for i in range(start_idx, len(line)):
+            char = line[i]
+            
+            if char in ['"', "'"] and (i == 0 or line[i-1] != '\\'):
+                if not in_quotes:
+                    in_quotes = True
+                    quote_char = char
+                elif char == quote_char:
+                    in_quotes = False
+                    quote_char = None
+            
+            elif char == '(' and not in_quotes:
+                open_parens += 1
+            elif char == ')' and not in_quotes:
+                if open_parens == 0:
+                    return line[start_idx:i].strip()
+                open_parens -= 1
+        
+        raise ValueError(f"Could not parse the content of {function_name} call: {line}")
+        
     def execute(self, code):
         code = self.remove_comments(code)
         lines = code.split('\n')
@@ -1140,7 +1167,7 @@ class interpreter:
                 continue
             
             elif line.startswith("gPrintln"):
-                gprint_match = re.match(r'gPrintln\((.*?)(?:,\s*end\s*=\s*([^)]+))?\)', line)
+                gprint_match = re.search(r'gPrintln\((.*?)(?:,\s*end\s*=\s*([^)]+))?\)$', line)
                 if gprint_match:
                     content = gprint_match.group(1).strip()
                     end_param = gprint_match.group(2)
@@ -1154,14 +1181,33 @@ class interpreter:
                     else:
                         gPrintln(content, self.variables)
                 else:
-                    content = re.match(r'gPrintln\((.*?)\)', line).group(1).strip()
+                    content = self._extract_function_contents(line, "gPrintln")
                     gPrintln(content, self.variables)
                 i += 1
                 continue
-
-
+            
+            elif line.startswith("gPrint"):
+                gprint_match = re.search(r'gPrint\((.*?)(?:,\s*end\s*=\s*([^)]+))?\)$', line)
+                if gprint_match:
+                    content = gprint_match.group(1).strip()
+                    end_param = gprint_match.group(2)
+                    if end_param:
+                        try:
+                            end_value = evaluate_expression(end_param, self.variables)
+                            gPrint(content, self.variables, end=end_value)
+                        except Exception as e:
+                            print(f"\033[31m[ERROR] Error evaluating end parameter: {e}\033[0m")
+                            gPrint(content, self.variables)
+                    else:
+                        gPrint(content, self.variables)
+                else:
+                    content = self._extract_function_contents(line, "gPrint")
+                    gPrint(content, self.variables)
+                i += 1
+                continue
+                
             elif line.startswith("gReadln"):
-                prompt = re.match(r'gReadln\((.*?)\)', line).group(1).strip()
+                prompt = self._extract_function_contents(line, "gReadln")
                 gReadln(prompt, self.variables)
                 i += 1
                 continue
