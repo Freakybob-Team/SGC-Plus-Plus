@@ -14,7 +14,8 @@ if __name__ == "__main__":
 
         color = "\033[32m" if exit_code == 0 else "\033[31m"
         reset = "\033[0m"
-
+        
+        print("\n")
         print("-" * 50)
         input(f"Exited with code: {color}{exit_code}{reset}. Press enter to exit...")
         sys.exit(exit_code)
