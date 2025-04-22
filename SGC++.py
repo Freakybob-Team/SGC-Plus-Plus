@@ -2,7 +2,7 @@
 SGC++ program runner
 This program runs the SGC++ program!!! meaning that SGC++ offically works on any device with python (hopefully)!!!!!
 -----------------------------------------------------------
-cooked up by Squirrel Gay Acorns (5quirre1) :3
+cooked up by Squirrel Acorns (5quirre1) :3
 """
 import os
 import json
