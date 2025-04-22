@@ -1246,6 +1246,10 @@ class interpreter:
             
                 i = next_idx
                 continue
+            else:
+                print(f"\033[31m[ERROR] Syntax Error on line {i+1}: Unrecognized statement: {line} \033[0m")
+                i += 1
+                continue
                 
 
     def run_file(self, filename):
