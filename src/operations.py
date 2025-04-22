@@ -2,11 +2,15 @@
 SGC++ Operations
 
 This module provides functions for performing operations in SGC++. The functions include:
-- gPrintln: Prints a message to the console, handling escape sequences like \n, \", etc.., and also supporting f-strings and better support for stuff.
+- gPrintln: Prints a message to the console with a newline, handling escape sequences and supporting f-strings.
+- gPrint: Prints a message to the console without a newline.
 - gReadln: Reads a line of input from the user and attempts to convert it to the appropriate type.
 """
 
 from utils import evaluate_expression
+
+def gPrint(text, variables):
+    return gPrintln(text, variables, end="")
 
 def gPrintln(text, variables, end="\n"):
     try:
@@ -21,20 +25,23 @@ def gPrintln(text, variables, end="\n"):
             print(*results, sep=' ', end=end)
             return ' '.join(str(r) for r in results)
 
-        elif isinstance(text, str) and '+' in text and not any(op in text for op in ['+=', '-=', '*=', '/=']):
+        elif isinstance(text, str) and ('+' in text or '(' in text or ')' in text) and not any(op in text for op in ['+=', '-=', '*=', '/=']):
             try:
                 result = evaluate_expression(text, variables)
                 print(result, end=end)
                 return result
             except Exception:
-                parts = text.split('+')
-                result = ''
-                for part in parts:
-                    part = part.strip()
-                    part_result = process_print_item(part, variables)
-                    result += str(part_result)
-                print(result, end=end)
-                return result
+                if '+' in text and '(' not in text and ')' not in text:
+                    parts = text.split('+')
+                    result = ''
+                    for part in parts:
+                        part = part.strip()
+                        part_result = process_print_item(part, variables)
+                        result += str(part_result)
+                    print(result, end=end)
+                    return result
+                else:
+                    raise
 
         else:
             result = process_print_item(text, variables)
@@ -50,6 +57,7 @@ def split_outside_quotes(s):
     current = ''
     in_quotes = False
     quote_char = None
+    paren_level = 0
     
     i = 0
     while i < len(s):
@@ -66,11 +74,17 @@ def split_outside_quotes(s):
                     in_quotes = False
                     quote_char = None
             current += char
-            
-        elif char == ',' and not in_quotes:
+        
+        elif char == '(' and not in_quotes:
+            paren_level += 1
+            current += char
+        elif char == ')' and not in_quotes:
+            paren_level -= 1
+            current += char
+
+        elif char == ',' and not in_quotes and paren_level == 0:
             parts.append(current.strip())
             current = ''
-
         else:
             current += char
         
