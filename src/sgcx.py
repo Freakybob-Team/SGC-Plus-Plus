@@ -99,73 +99,72 @@ class interpreter:
         return code
         
     def _parse_import_statement(self, line):
-        import_match = re.match(r'import\s+(\w+)(\s+as\s+(\w+))?', line)
-        from_import_match = re.match(r'from\s+(\w+)\s+import\s+([*\w]+)(\s+as\s+(\w+))?', line)
-
+        import_match = re.match(r'import\s+([\w\s,]+)', line)
+        from_import_match = re.match(r'from\s+(\w+)\s+import\s+([*\w\s,]+)', line)
+    
         if import_match:
-            module_name = import_match.group(1)
-            alias = import_match.group(3) or module_name
-            
-            try:
-                
-                module = self._import_local_module(module_name)
-                if module is None:  
-                    module = importlib.import_module(module_name)
-                
-                self.modules[alias] = module
-                self.module_aliases[alias] = module_name
-                return True
-            except Exception as e:
-                print(f"\033[31m[ERROR] Failed to import '{module_name}': {e}\033[0m")
-                return False
-
+            imports_str = import_match.group(1)
+            imports_list = [imp.strip() for imp in imports_str.split(',')]
+            all_succeeded = True
+    
+            for import_item in imports_list:
+                item_match = re.match(r'(\w+)(\s+as\s+(\w+))?', import_item)
+                if item_match:
+                    module_name = item_match.group(1)
+                    alias = item_match.group(3) or module_name
+    
+                    try:
+                        module = self._import_local_module(module_name)
+                        if module is None:  
+                            module = importlib.import_module(module_name)
+    
+                        self.modules[alias] = module
+                        self.module_aliases[alias] = module_name
+    
+                        self.variables[alias] = module
+                    except Exception as e:
+                        print(f"\033[31m[ERROR] Failed to import '{module_name}': {e}\033[0m")
+                        all_succeeded = False
+    
+            return all_succeeded
+    
         elif from_import_match:
             module_name = from_import_match.group(1)
             import_items = from_import_match.group(2)
-            alias = from_import_match.group(4)
-
+    
             try:
-                
                 module = self._import_local_module(module_name)
                 if module is None:  
                     module = importlib.import_module(module_name)
-                
-                if import_items == '*':
+    
+                if import_items.strip() == '*':
                     for name in dir(module):
                         if not name.startswith('_'):
-                            if alias:
-                                self.variables[f"{alias}.{name}"] = getattr(module, name)
-                            else:
-                                self.variables[name] = getattr(module, name)
+                            self.variables[name] = getattr(module, name)
                 else:
                     items = [item.strip() for item in import_items.split(',')]
                     for item in items:
-                        item_alias_match = re.match(r'(\w+)\s+as\s+(\w+)', item)
+                        item_alias_match = re.match(r'(\w+)(\s+as\s+(\w+))?', item)
                         if item_alias_match:
                             original_name = item_alias_match.group(1)
-                            local_alias = item_alias_match.group(2)
-                            
+                            local_alias = item_alias_match.group(3) or original_name
+    
                             if hasattr(module, original_name):
-                                if alias:
-                                    self.variables[f"{alias}.{local_alias}"] = getattr(module, original_name)
-                                else:
-                                    self.variables[local_alias] = getattr(module, original_name)
-                        else:
-                            if hasattr(module, item):
-                                if alias:
-                                    self.variables[f"{alias}.{item}"] = getattr(module, item)
-                                else:
-                                    self.variables[item] = getattr(module, item)
-                
-                if alias:
-                    self.modules[alias] = module
-                    self.module_aliases[alias] = module_name
-
+                                self.variables[local_alias] = getattr(module, original_name)
+                            else:
+                                print(f"\033[31m[ERROR] Module '{module_name}' has no attribute '{original_name}'\033[0m")
+    
+                if module_name not in self.modules:
+                    self.modules[module_name] = module
+                    self.module_aliases[module_name] = module_name
+    
+                self.variables[module_name] = module
+    
                 return True
             except Exception as e:
                 print(f"\033[31m[ERROR] Failed to import from '{module_name}': {e}\033[0m")
                 return False
-
+    
         return False
     
     def _import_local_module(self, module_name):       
@@ -174,7 +173,7 @@ class interpreter:
             f"./{module_name}.py",
             f"{module_name}/__init__.py"
         ]
-        
+    
         for path in possible_paths:
             if os.path.exists(path):
                 try:
@@ -183,14 +182,14 @@ class interpreter:
                     spec = importlib.util.spec_from_file_location(module_name_to_use, abs_path)
                     if spec is None:
                         continue
-            
+    
                     module = importlib.util.module_from_spec(spec)
                     sys.modules[module_name_to_use] = module
                     spec.loader.exec_module(module)
                     return module
                 except Exception as e:
                     print(f"\033[31m[ERROR] Failed to import local file '{path}': {e}\033[0m")
-        
+    
         return None
 
     
@@ -409,6 +408,19 @@ class interpreter:
             if not line:
                 i += 1
                 continue
+            
+            module_attr_match = re.match(r'^(\w+)\.(\w+)', line)
+            if module_attr_match and not line.startswith(("var", "let", "const")) and "=" not in line.split("(")[0]:
+                module_name = module_attr_match.group(1)
+                
+                if module_name in self.modules or module_name in self.variables:
+                    try:
+                        evaluate_expression(line, {**self.variables, **self.builtins, **self.modules})
+                    except Exception as e:
+                        print(f"\033[31m[ERROR] Error evaluating module expression on line {i+1}: {e}\033[0m")
+                    i += 1
+                    continue
+
 
             if line.startswith("import ") or line.startswith("from "):
                 if self._parse_import_statement(line):
