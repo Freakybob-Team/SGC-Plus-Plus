@@ -1,26 +1,7 @@
-"""
-SGC++ Utils
-
-This module provides utility functions for working with SGC++, including expression evaluation.
-
-Functions:
-- `evaluate_expression(expr, variables)`: Safely evaluates an expression string using the provided variables.
-Some stuff it does:
-- it makes sure that module.class.function() works !!
-- more stuff but too lazy
-
-"""
 import re
 
 def evaluate_expression(expr, variables):
     try:
-
-        try:
-
-            return float(expr)
-        except ValueError:
-            pass
-
         if '.' in expr and not expr.startswith('"') and not expr.startswith("'"):
             method_call_match = re.match(r'^([\w\.]+)\((.*)\)$', expr)
             if method_call_match:
