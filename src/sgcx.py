@@ -437,7 +437,7 @@ class interpreter:
                     print(f"\033[31m[ERROR] Empty while loop body on line {i + 1}\033[0m")
                     i = next_idx
                     continue
-
+                
                 while True:
                     condition_result = evaluate_expression(condition_expr, self.variables)
             
@@ -450,8 +450,6 @@ class interpreter:
                     if self.variables.pop('break', None):
                         break
             
-                    if self.variables.pop('continue', None):
-                        continue
             
                 i = next_idx
                 continue
